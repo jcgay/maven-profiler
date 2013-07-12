@@ -3,9 +3,7 @@ package com.github.jcgay.maven.profiler;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
-import com.google.common.collect.Tables;
 import org.apache.maven.eventspy.AbstractEventSpy;
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.ExecutionEvent;
@@ -24,9 +22,8 @@ public class ProfilerEventSpy extends AbstractEventSpy {
     @Requirement
     private Logger logger;
 
-    private Stopwatch projectStopWatch = new Stopwatch();
-    private ConcurrentHashMap<MavenProject, ConcurrentHashMap<MojoExecution, Stopwatch>> result =
-            new ConcurrentHashMap<MavenProject, ConcurrentHashMap<MojoExecution, Stopwatch>>();
+    private Map<MavenProject, Stopwatch> projects = new ConcurrentHashMap<MavenProject, Stopwatch>();
+    private Table<MavenProject, MojoExecution, Stopwatch> timers = HashBasedTable.create();
 
     public ProfilerEventSpy() {
         // Do nothing.
@@ -34,11 +31,11 @@ public class ProfilerEventSpy extends AbstractEventSpy {
 
     @VisibleForTesting
     ProfilerEventSpy(Logger logger,
-                     Stopwatch projectStopWatch,
-                     ConcurrentHashMap<MavenProject, ConcurrentHashMap<MojoExecution, Stopwatch>> mojosStopWatchesByProject) {
+                     ConcurrentHashMap<MavenProject, Stopwatch> projects,
+                     Table<MavenProject, MojoExecution, Stopwatch> timers) {
         this.logger = logger;
-        this.projectStopWatch = projectStopWatch;
-        this.result = mojosStopWatchesByProject;
+        this.projects = projects;
+        this.timers = timers;
     }
 
     @Override
@@ -47,35 +44,43 @@ public class ProfilerEventSpy extends AbstractEventSpy {
         if (event instanceof ExecutionEvent) {
             ExecutionEvent currentEvent = (ExecutionEvent) event;
             ExecutionEvent.Type type = currentEvent.getType();
+            MavenProject currentProject = currentEvent.getSession().getCurrentProject();
             if (type == ExecutionEvent.Type.ProjectStarted) {
-                logger.debug("Starting timer for starting project.");
-                projectStopWatch.start();
+                startProject(currentProject);
             }
             if (type == ExecutionEvent.Type.ProjectSucceeded || type == ExecutionEvent.Type.ProjectFailed) {
-                logger.debug("Stopping timer for project.");
-                projectStopWatch.stop();
+                stopProject(currentProject);
             }
-            MavenProject currentProject = currentEvent.getSession().getCurrentProject();
             if (type == ExecutionEvent.Type.MojoStarted) {
-                Map<MojoExecution, Stopwatch> mojos = result.get(currentProject);
-                if (mojos == null) {
-                    result.putIfAbsent(currentProject, new ConcurrentHashMap<MojoExecution, Stopwatch>());
-                }
-                logger.debug(String.format("Starting timer for mojo [%s] in project [%s].", currentEvent.getMojoExecution(), currentProject));
-                result.get(currentProject).putIfAbsent(currentEvent.getMojoExecution(), new Stopwatch().start());
+                startMojo(currentEvent, currentProject);
             }
             if (type == ExecutionEvent.Type.MojoSucceeded || type == ExecutionEvent.Type.MojoFailed) {
-                ConcurrentHashMap<MojoExecution, Stopwatch> project = result.get(currentProject);
-                if (project != null) {
-                    Stopwatch stopwatch = project.get(currentEvent.getMojoExecution());
-                    if (stopwatch != null) {
-                        logger.debug(String.format("Stopping timer for mojo [%s] in project [%s].", currentEvent.getMojoExecution(), currentProject));
-                        stopwatch.stop();
-                    }
-                }
+                stopMojo(currentEvent, currentProject);
             }
         }
         super.onEvent(event);
+    }
+
+    private void stopMojo(ExecutionEvent currentEvent, MavenProject currentProject) {
+        logger.debug(String.format("Stopping timer for mojo [%s] in project [%s].", currentEvent.getMojoExecution(), currentProject));
+        timers.get(currentProject, currentEvent.getMojoExecution()).stop();
+    }
+
+    private void startMojo(ExecutionEvent currentEvent, MavenProject currentProject) {
+        logger.debug(String.format("Starting timer for mojo [%s] in project [%s].", currentEvent.getMojoExecution(), currentProject));
+        synchronized (currentEvent) {
+            timers.put(currentProject, currentEvent.getMojoExecution(), new Stopwatch().start());
+        }
+    }
+
+    private void stopProject(MavenProject currentProject) {
+        logger.debug("Stopping timer for project: " + currentProject);
+        projects.get(currentProject).stop();
+    }
+
+    private void startProject(MavenProject currentProject) {
+        logger.debug("Starting timer for project: " + currentProject);
+        projects.put(currentProject, new Stopwatch().start());
     }
 
     @Override
@@ -83,14 +88,13 @@ public class ProfilerEventSpy extends AbstractEventSpy {
 
         logger.info("EXECUTION TIME");
         logger.info("------------------------------------------------------------------------");
-        for (Map.Entry<MavenProject, ConcurrentHashMap<MojoExecution, Stopwatch>> project : result.entrySet()) {
-            logger.info(project.getKey().getName() + ": ");
-            PrintDescriptor descriptor = PrintDescriptor.instance(project.getValue());
+        for (MavenProject project : timers.rowKeySet()) {
+            logger.info(project.getName() + ": " + projects.get(project));
+            PrintDescriptor descriptor = PrintDescriptor.instance(timers.row(project));
             for (Map.Entry<MojoExecution, Stopwatch> mojo : descriptor.getSortedMojosExecutionTime()) {
                 logger.info(descriptor.getFormattedLine(mojo));
             }
         }
-        logger.info("\nProject time: " + projectStopWatch);
         super.close();
     }
 }

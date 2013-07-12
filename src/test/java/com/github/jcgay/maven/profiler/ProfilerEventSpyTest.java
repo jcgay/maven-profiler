@@ -1,6 +1,8 @@
 package com.github.jcgay.maven.profiler;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -16,24 +18,25 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.guava.api.Assertions.assertThat;
 
 public class ProfilerEventSpyTest {
 
     private ProfilerEventSpy profiler;
-    private ConcurrentHashMap<MavenProject, ConcurrentHashMap<MojoExecution, Stopwatch>> result;
-    private Stopwatch project;
+    private Table<MavenProject, MojoExecution, Stopwatch> timers;
+    private ConcurrentHashMap<MavenProject, Stopwatch> projects;
     private Logger logger;
 
     @BeforeMethod
     public void setUp() throws Exception {
-        result = new ConcurrentHashMap<MavenProject, ConcurrentHashMap<MojoExecution, Stopwatch>>();
-        project = new Stopwatch();
+        timers = HashBasedTable.create();
+        projects = new ConcurrentHashMap<MavenProject, Stopwatch>();
         logger = new ConsoleLogger();
 
         profiler = new ProfilerEventSpy(
                 logger,
-                project,
-                result
+                projects,
+                timers
         );
     }
 
@@ -44,9 +47,10 @@ public class ProfilerEventSpyTest {
 
         profiler.onEvent(event);
 
-        assertThat(result.get(event.getSession().getCurrentProject())
-                         .get(event.getMojoExecution())
-                         .isRunning())
+        assertThat(timers)
+                .containsRows(event.getSession().getCurrentProject())
+                .containsColumns(event.getMojoExecution());
+        assertThat(timers.row(event.getSession().getCurrentProject()).get(event.getMojoExecution()).isRunning())
                 .isTrue();
     }
 
@@ -58,13 +62,13 @@ public class ProfilerEventSpyTest {
 
         profiler.onEvent(event);
 
-        assertThat(result.get(event.getSession().getCurrentProject())
-                         .get(event.getMojoExecution())
-                         .isRunning())
+        assertThat(timers)
+                .containsRows(event.getSession().getCurrentProject())
+                .containsColumns(event.getMojoExecution());
+
+        assertThat(timers.row(event.getSession().getCurrentProject()).get(event.getMojoExecution()).isRunning())
                 .isFalse();
-        assertThat(result.get(event.getSession().getCurrentProject())
-                         .get(event.getMojoExecution())
-                         .elapsedMillis())
+        assertThat(timers.row(event.getSession().getCurrentProject()).get(event.getMojoExecution()).elapsedMillis())
                 .isPositive();
     }
 
@@ -79,20 +83,23 @@ public class ProfilerEventSpyTest {
     @Test
     public void should_start_timer_when_project_start() throws Exception {
 
-        profiler.onEvent(aProjectEvent(ExecutionEvent.Type.ProjectStarted));
+        ExecutionEvent event = aProjectEvent(ExecutionEvent.Type.ProjectStarted);
 
-        assertThat(project.isRunning()).isTrue();
+        profiler.onEvent(event);
+
+        assertThat(projects.get(event.getSession().getCurrentProject()).isRunning()).isTrue();
     }
 
     @Test(dataProvider = "project_succeed_and_fail")
     public void should_stop_timer_when_project_fail_or_succeed(ExecutionEvent.Type type) throws Exception {
 
         given_project_has_start();
+        ExecutionEvent event = aProjectEvent(type);
 
-        profiler.onEvent(aProjectEvent(type));
+        profiler.onEvent(event);
 
-        assertThat(project.isRunning()).isFalse();
-        assertThat(project.elapsedMillis()).isPositive();
+        assertThat(projects.get(event.getSession().getCurrentProject()).isRunning()).isFalse();
+        assertThat(projects.get(event.getSession().getCurrentProject()).elapsedMillis()).isPositive();
     }
 
     @DataProvider
