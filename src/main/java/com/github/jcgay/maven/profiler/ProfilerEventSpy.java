@@ -43,13 +43,16 @@ public class ProfilerEventSpy extends AbstractEventSpy {
 
     @Override
     public void onEvent(Object event) throws Exception {
+        logger.debug("Received event: " + event);
         if (event instanceof ExecutionEvent) {
             ExecutionEvent currentEvent = (ExecutionEvent) event;
             ExecutionEvent.Type type = currentEvent.getType();
             if (type == ExecutionEvent.Type.ProjectStarted) {
+                logger.debug("Starting timer for starting project.");
                 projectStopWatch.start();
             }
             if (type == ExecutionEvent.Type.ProjectSucceeded || type == ExecutionEvent.Type.ProjectFailed) {
+                logger.debug("Stopping timer for project.");
                 projectStopWatch.stop();
             }
             MavenProject currentProject = currentEvent.getSession().getCurrentProject();
@@ -58,6 +61,7 @@ public class ProfilerEventSpy extends AbstractEventSpy {
                 if (mojos == null) {
                     result.putIfAbsent(currentProject, new ConcurrentHashMap<MojoExecution, Stopwatch>());
                 }
+                logger.debug(String.format("Starting timer for mojo [%s] in project [%s].", currentEvent.getMojoExecution(), currentProject));
                 result.get(currentProject).putIfAbsent(currentEvent.getMojoExecution(), new Stopwatch().start());
             }
             if (type == ExecutionEvent.Type.MojoSucceeded || type == ExecutionEvent.Type.MojoFailed) {
@@ -65,6 +69,7 @@ public class ProfilerEventSpy extends AbstractEventSpy {
                 if (project != null) {
                     Stopwatch stopwatch = project.get(currentEvent.getMojoExecution());
                     if (stopwatch != null) {
+                        logger.debug(String.format("Stopping timer for mojo [%s] in project [%s].", currentEvent.getMojoExecution(), currentProject));
                         stopwatch.stop();
                     }
                 }

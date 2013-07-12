@@ -6,6 +6,8 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -20,14 +22,16 @@ public class ProfilerEventSpyTest {
     private ProfilerEventSpy profiler;
     private ConcurrentHashMap<MavenProject, ConcurrentHashMap<MojoExecution, Stopwatch>> result;
     private Stopwatch project;
+    private Logger logger;
 
     @BeforeMethod
     public void setUp() throws Exception {
         result = new ConcurrentHashMap<MavenProject, ConcurrentHashMap<MojoExecution, Stopwatch>>();
         project = new Stopwatch();
+        logger = new ConsoleLogger();
 
         profiler = new ProfilerEventSpy(
-                null,
+                logger,
                 project,
                 result
         );
