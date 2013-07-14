@@ -24,15 +24,18 @@ public class ProfilerEventSpy extends AbstractEventSpy {
 
     private Map<MavenProject, Stopwatch> projects = new ConcurrentHashMap<MavenProject, Stopwatch>();
     private Table<MavenProject, MojoExecution, Stopwatch> timers = HashBasedTable.create();
+    private boolean isActive;
 
     public ProfilerEventSpy() {
-        // Do nothing.
+        String parameter = System.getProperty("profile");
+        isActive = parameter != null && !"false".equalsIgnoreCase(parameter);
     }
 
     @VisibleForTesting
     ProfilerEventSpy(Logger logger,
                      ConcurrentHashMap<MavenProject, Stopwatch> projects,
                      Table<MavenProject, MojoExecution, Stopwatch> timers) {
+        this();
         this.logger = logger;
         this.projects = projects;
         this.timers = timers;
@@ -40,7 +43,22 @@ public class ProfilerEventSpy extends AbstractEventSpy {
 
     @Override
     public void onEvent(Object event) throws Exception {
-        logger.debug("Received event: " + event);
+        if (isActive) {
+            saveTime(event);
+        }
+        super.onEvent(event);
+    }
+
+    @Override
+    public void close() throws Exception {
+        if (isActive) {
+            printTime();
+        }
+        super.close();
+    }
+
+    private void saveTime(Object event) {
+        logger.debug(String.format("Received event (%s): %s", event.getClass(), event));
         if (event instanceof ExecutionEvent) {
             ExecutionEvent currentEvent = (ExecutionEvent) event;
             ExecutionEvent.Type type = currentEvent.getType();
@@ -58,7 +76,6 @@ public class ProfilerEventSpy extends AbstractEventSpy {
                 stopMojo(currentEvent, currentProject);
             }
         }
-        super.onEvent(event);
     }
 
     private void stopMojo(ExecutionEvent currentEvent, MavenProject currentProject) {
@@ -83,9 +100,7 @@ public class ProfilerEventSpy extends AbstractEventSpy {
         projects.put(currentProject, new Stopwatch().start());
     }
 
-    @Override
-    public void close() throws Exception {
-
+    private void printTime() {
         logger.info("EXECUTION TIME");
         logger.info("------------------------------------------------------------------------");
         PrintDescriptor descriptor = PrintDescriptor.instance(timers);
@@ -95,6 +110,5 @@ public class ProfilerEventSpy extends AbstractEventSpy {
                 logger.info(descriptor.getFormattedLine(mojo));
             }
         }
-        super.close();
     }
 }

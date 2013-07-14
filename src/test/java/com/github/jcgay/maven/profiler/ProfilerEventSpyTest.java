@@ -33,6 +33,7 @@ public class ProfilerEventSpyTest {
         projects = new ConcurrentHashMap<MavenProject, Stopwatch>();
         logger = new ConsoleLogger();
 
+        System.setProperty("profile", "true");
         profiler = new ProfilerEventSpy(
                 logger,
                 projects,
@@ -108,6 +109,25 @@ public class ProfilerEventSpyTest {
                 {ExecutionEvent.Type.ProjectSucceeded},
                 {ExecutionEvent.Type.ProjectFailed}
         };
+    }
+
+    @Test
+    public void should_not_log_time_when_property_profile_is_not_set() throws Exception {
+
+        // Given
+        System.setProperty("profile", "false");
+
+        ExecutionEvent startEvent = aMojoEvent(ExecutionEvent.Type.MojoSucceeded, aMavenProject("a-project"));
+        ExecutionEvent endEvent = aMojoEvent(ExecutionEvent.Type.MojoSucceeded, aMavenProject("a-project"));
+        ProfilerEventSpy spy = new ProfilerEventSpy(logger, projects, timers);
+
+        // When
+        spy.onEvent(startEvent);
+        spy.onEvent(endEvent);
+
+        // Then
+        assertThat(projects).isEmpty();
+        assertThat(timers).isEmpty();
     }
 
     private static MavenProject aMavenProject(String name) {
