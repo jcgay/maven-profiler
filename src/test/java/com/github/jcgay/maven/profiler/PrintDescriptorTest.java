@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static com.github.jcgay.maven.profiler.KnownElapsedTimeTicker.aStopWatchWithElapsedTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.atIndex;
 
@@ -72,10 +73,6 @@ public class PrintDescriptorTest {
         return new MojoExecutionWithPrintSize(size);
     }
 
-    private static Stopwatch aStopWatchWithElapsedTime(long elapsedTime) {
-        return new Stopwatch(new KnownElapsedTimeTicker(elapsedTime)).start().stop();
-    }
-
     private static class MojoExecution extends Condition<Map.Entry<org.apache.maven.plugin.MojoExecution, Stopwatch>> {
 
         private String id;
@@ -92,22 +89,6 @@ public class PrintDescriptorTest {
         @Override
         public boolean matches(Map.Entry<org.apache.maven.plugin.MojoExecution, Stopwatch> entry) {
             return entry.getKey().getExecutionId().equals(id);
-        }
-    }
-
-    private static class KnownElapsedTimeTicker extends Ticker {
-
-        private long expectedElapsedTime;
-        private boolean firstRead;
-
-        private KnownElapsedTimeTicker(long expectedElapsedTime) {
-            this.expectedElapsedTime = expectedElapsedTime;
-        }
-
-        @Override
-        public long read() {
-            firstRead = !firstRead;
-            return firstRead ? 0 : expectedElapsedTime;
         }
     }
 
