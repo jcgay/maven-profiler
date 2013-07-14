@@ -2,12 +2,14 @@ package com.github.jcgay.maven.profiler;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Ticker;
+import com.google.common.collect.HashBasedTable;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.project.MavenProject;
 import org.assertj.core.api.Condition;
 import org.codehaus.plexus.util.StringUtils;
 import org.testng.annotations.Test;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -20,16 +22,17 @@ public class PrintDescriptorTest {
     @Test
     public void should_get_mojos_execution_time_ordered_by_spent_time() throws Exception {
 
-        HashMap<org.apache.maven.plugin.MojoExecution, Stopwatch> mojos = new HashMap<org.apache.maven.plugin.MojoExecution, Stopwatch>();
-        mojos.put(aMojoExecution("1"), aStopWatchWithElapsedTime(TimeUnit.MILLISECONDS.toNanos(20)));
-        mojos.put(aMojoExecution("2"), aStopWatchWithElapsedTime(TimeUnit.SECONDS.toNanos(1)));
-        mojos.put(aMojoExecution("3"), aStopWatchWithElapsedTime(TimeUnit.SECONDS.toNanos(2)));
-        mojos.put(aMojoExecution("4"), aStopWatchWithElapsedTime(TimeUnit.SECONDS.toNanos(3)));
-        mojos.put(aMojoExecution("5"), aStopWatchWithElapsedTime(TimeUnit.MINUTES.toNanos(1)));
+        MavenProject project = aMavenProject("project");
+        HashBasedTable<MavenProject, org.apache.maven.plugin.MojoExecution, Stopwatch> timers = HashBasedTable.create();
+        timers.put(project, aMojoExecution("1"), aStopWatchWithElapsedTime(TimeUnit.MILLISECONDS.toNanos(20)));
+        timers.put(project, aMojoExecution("2"), aStopWatchWithElapsedTime(TimeUnit.SECONDS.toNanos(1)));
+        timers.put(project, aMojoExecution("3"), aStopWatchWithElapsedTime(TimeUnit.SECONDS.toNanos(2)));
+        timers.put(project, aMojoExecution("4"), aStopWatchWithElapsedTime(TimeUnit.SECONDS.toNanos(3)));
+        timers.put(project, aMojoExecution("5"), aStopWatchWithElapsedTime(TimeUnit.MINUTES.toNanos(1)));
 
-        PrintDescriptor result = PrintDescriptor.instance(mojos);
+        PrintDescriptor result = PrintDescriptor.instance(timers);
 
-        assertThat(result.getSortedMojosExecutionTime())
+        assertThat(result.getSortedMojosByTime(project))
                 .has(MojoExecution.id("5"), atIndex(0))
                 .has(MojoExecution.id("4"), atIndex(1))
                 .has(MojoExecution.id("3"), atIndex(2))
@@ -55,12 +58,14 @@ public class PrintDescriptorTest {
     @Test
     public void should_get_formatted_line_to_print() throws Exception {
 
-        HashMap<org.apache.maven.plugin.MojoExecution, Stopwatch> mojos = new HashMap<org.apache.maven.plugin.MojoExecution, Stopwatch>();
-        mojos.put(aMojoExecutionWithPrintSize(7), aStopWatchWithElapsedTime(TimeUnit.MILLISECONDS.toNanos(20)));
-        mojos.put(aMojoExecutionWithPrintSize(10), aStopWatchWithElapsedTime(TimeUnit.SECONDS.toNanos(1)));
-        mojos.put(aMojoExecutionWithPrintSize(3), aStopWatchWithElapsedTime(TimeUnit.SECONDS.toNanos(2)));
+        MavenProject project = aMavenProject("project");
+        MavenProject project_two = aMavenProject("project-2");
+        HashBasedTable<MavenProject, org.apache.maven.plugin.MojoExecution, Stopwatch> timers = HashBasedTable.create();
+        timers.put(project, aMojoExecutionWithPrintSize(7), aStopWatchWithElapsedTime(TimeUnit.MILLISECONDS.toNanos(20)));
+        timers.put(project_two, aMojoExecutionWithPrintSize(10), aStopWatchWithElapsedTime(TimeUnit.SECONDS.toNanos(1)));
+        timers.put(project, aMojoExecutionWithPrintSize(3), aStopWatchWithElapsedTime(TimeUnit.SECONDS.toNanos(2)));
 
-        PrintDescriptor result = PrintDescriptor.instance(mojos);
+        PrintDescriptor result = PrintDescriptor.instance(timers);
 
         assertThat(result.maxKeyLength).isEqualTo(10);
     }
@@ -71,6 +76,15 @@ public class PrintDescriptorTest {
 
     private static org.apache.maven.plugin.MojoExecution aMojoExecutionWithPrintSize(int size) {
         return new MojoExecutionWithPrintSize(size);
+    }
+
+    private static MavenProject aMavenProject(String name) {
+        Model model = new Model();
+        model.setName(name);
+        model.setGroupId("groupId-" + name);
+        model.setArtifactId("artifactId");
+        model.setVersion("version");
+        return new MavenProject(model);
     }
 
     private static class MojoExecution extends Condition<Map.Entry<org.apache.maven.plugin.MojoExecution, Stopwatch>> {

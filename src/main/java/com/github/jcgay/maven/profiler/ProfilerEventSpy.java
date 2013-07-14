@@ -88,10 +88,10 @@ public class ProfilerEventSpy extends AbstractEventSpy {
 
         logger.info("EXECUTION TIME");
         logger.info("------------------------------------------------------------------------");
+        PrintDescriptor descriptor = PrintDescriptor.instance(timers);
         for (MavenProject project : ProjectsSorter.byExecutionTime(projects)) {
             logger.info(project.getName() + ": " + projects.get(project));
-            PrintDescriptor descriptor = PrintDescriptor.instance(timers.row(project));
-            for (Map.Entry<MojoExecution, Stopwatch> mojo : descriptor.getSortedMojosExecutionTime()) {
+            for (Map.Entry<MojoExecution, Stopwatch> mojo : descriptor.getSortedMojosByTime(project)) {
                 logger.info(descriptor.getFormattedLine(mojo));
             }
         }
