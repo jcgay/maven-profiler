@@ -4,7 +4,7 @@
 
     <groupId>com.github.jcgay.maven</groupId>
     <artifactId>maven-profiler</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1</version>
 
     <prerequisites>
         <maven>2.2.1</maven>
@@ -14,7 +14,8 @@
         <url>https://github.com/jcgay/maven-profiler.git</url>
         <connection>scm:git:git://github.com/jcgay/maven-profiler.git</connection>
         <developerConnection>scm:git:git@github.com:jcgay/maven-profiler.git</developerConnection>
-    </scm>
+      <tag>v0.1</tag>
+  </scm>
 
     <distributionManagement>
         <repository>
