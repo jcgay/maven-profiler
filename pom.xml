@@ -87,6 +87,7 @@
                 <version>2.4</version>
                 <configuration>
                     <tagNameFormat>v@{project.version}</tagNameFormat>
+                    <localCheckout>true</localCheckout>
                 </configuration>
             </plugin>
             <plugin>
