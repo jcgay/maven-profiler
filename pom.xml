@@ -6,11 +6,15 @@
     <artifactId>maven-profiler</artifactId>
     <version>0.1-SNAPSHOT</version>
 
+    <prerequisites>
+        <maven>2.2.1</maven>
+    </prerequisites>
+
     <scm>
         <url>https://github.com/jcgay/maven-profiler.git</url>
         <connection>scm:git:git://github.com/jcgay/maven-profiler.git</connection>
         <developerConnection>scm:git:git@github.com:jcgay/maven-profiler.git</developerConnection>
-  </scm>
+    </scm>
 
     <distributionManagement>
         <repository>
@@ -37,7 +41,7 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>6.5.2</version>
+            <version>6.8.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -84,7 +88,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.4</version>
+                <version>2.4.1</version>
                 <configuration>
                     <tagNameFormat>v@{project.version}</tagNameFormat>
                     <localCheckout>true</localCheckout>
