@@ -12,12 +12,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class PrintDescriptor {
+public class ExecutionTimeDescriptor {
 
     @VisibleForTesting int maxKeyLength;
     private Table<MavenProject, MojoExecution, Stopwatch> timers;
 
-    private PrintDescriptor(Table<MavenProject, MojoExecution, Stopwatch> timers) {
+    private ExecutionTimeDescriptor(Table<MavenProject, MojoExecution, Stopwatch> timers) {
         this.timers = timers;
         this.maxKeyLength = maxToStringLength(timers.columnKeySet());
     }
@@ -26,8 +26,8 @@ public class PrintDescriptor {
         return String.format(String.format("%-" + maxKeyLength + "s %s", entry.getKey(), entry.getValue()));
     }
 
-    public static PrintDescriptor instance(Table<MavenProject, MojoExecution, Stopwatch> timers) {
-        return new PrintDescriptor(timers);
+    public static ExecutionTimeDescriptor instance(Table<MavenProject, MojoExecution, Stopwatch> timers) {
+        return new ExecutionTimeDescriptor(timers);
     }
 
     public List<Map.Entry<MojoExecution, Stopwatch>> getSortedMojosByTime(MavenProject project) {

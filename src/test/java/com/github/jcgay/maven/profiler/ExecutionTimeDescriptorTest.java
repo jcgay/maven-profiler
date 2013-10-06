@@ -17,7 +17,7 @@ import static com.github.jcgay.maven.profiler.KnownElapsedTimeTicker.aStopWatchW
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.atIndex;
 
-public class PrintDescriptorTest {
+public class ExecutionTimeDescriptorTest {
 
     @Test
     public void should_get_mojos_execution_time_ordered_by_spent_time() throws Exception {
@@ -30,7 +30,7 @@ public class PrintDescriptorTest {
         timers.put(project, aMojoExecution("4"), aStopWatchWithElapsedTime(TimeUnit.SECONDS.toNanos(3)));
         timers.put(project, aMojoExecution("5"), aStopWatchWithElapsedTime(TimeUnit.MINUTES.toNanos(1)));
 
-        PrintDescriptor result = PrintDescriptor.instance(timers);
+        ExecutionTimeDescriptor result = ExecutionTimeDescriptor.instance(timers);
 
         assertThat(result.getSortedMojosByTime(project))
                 .has(MojoExecution.id("5"), atIndex(0))
@@ -65,7 +65,7 @@ public class PrintDescriptorTest {
         timers.put(project_two, aMojoExecutionWithPrintSize(10), aStopWatchWithElapsedTime(TimeUnit.SECONDS.toNanos(1)));
         timers.put(project, aMojoExecutionWithPrintSize(3), aStopWatchWithElapsedTime(TimeUnit.SECONDS.toNanos(2)));
 
-        PrintDescriptor result = PrintDescriptor.instance(timers);
+        ExecutionTimeDescriptor result = ExecutionTimeDescriptor.instance(timers);
 
         assertThat(result.maxKeyLength).isEqualTo(10);
     }

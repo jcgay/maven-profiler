@@ -132,7 +132,7 @@ public class ProfilerEventSpy extends AbstractEventSpy {
     private void printTime() {
         logger.info("EXECUTION TIME");
         separator();
-        PrintDescriptor descriptor = PrintDescriptor.instance(timers);
+        ExecutionTimeDescriptor descriptor = ExecutionTimeDescriptor.instance(timers);
         for (MavenProject project : ProjectsSorter.byExecutionTime(projects)) {
             logger.info(project.getName() + ": " + projects.get(project));
             for (Map.Entry<MojoExecution, Stopwatch> mojo : descriptor.getSortedMojosByTime(project)) {
@@ -149,8 +149,9 @@ public class ProfilerEventSpy extends AbstractEventSpy {
         separator();
         logger.info("DOWNLOADING TIME");
         separator();
+        ArtifactDescriptor descriptor = ArtifactDescriptor.instance(downloadTimers);
         for (Artifact artifact : ProjectsSorter.byExecutionTime(downloadTimers)) {
-            logger.info(artifact + ": " + downloadTimers.get(artifact));
+            logger.info(descriptor.getFormattedLine(artifact) + downloadTimers.get(artifact));
         }
     }
 }
