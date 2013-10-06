@@ -10,11 +10,18 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
+import org.sonatype.aether.RepositoryEvent;
+import org.sonatype.aether.artifact.Artifact;
+import org.sonatype.aether.util.DefaultRepositorySystemSession;
+import org.sonatype.aether.util.DefaultRequestTrace;
+import org.sonatype.aether.util.artifact.DefaultArtifact;
+import org.sonatype.aether.util.listener.DefaultRepositoryEvent;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,12 +31,15 @@ public class ProfilerEventSpyTest {
 
     private ProfilerEventSpy profiler;
     private Table<MavenProject, MojoExecution, Stopwatch> timers;
+    private ConcurrentMap<Artifact, Stopwatch> downloadTimers;
     private ConcurrentHashMap<MavenProject, Stopwatch> projects;
     private Logger logger;
 
     @BeforeMethod
     public void setUp() throws Exception {
         timers = HashBasedTable.create();
+        downloadTimers = new ConcurrentHashMap<Artifact, Stopwatch>();
+
         projects = new ConcurrentHashMap<MavenProject, Stopwatch>();
         logger = new ConsoleLogger();
 
@@ -37,7 +47,8 @@ public class ProfilerEventSpyTest {
         profiler = new ProfilerEventSpy(
                 logger,
                 projects,
-                timers
+                timers,
+                downloadTimers
         );
     }
 
@@ -119,7 +130,7 @@ public class ProfilerEventSpyTest {
 
         ExecutionEvent startEvent = aMojoEvent(ExecutionEvent.Type.MojoSucceeded, aMavenProject("a-project"));
         ExecutionEvent endEvent = aMojoEvent(ExecutionEvent.Type.MojoSucceeded, aMavenProject("a-project"));
-        ProfilerEventSpy spy = new ProfilerEventSpy(logger, projects, timers);
+        ProfilerEventSpy spy = new ProfilerEventSpy(logger, projects, timers, downloadTimers);
 
         // When
         spy.onEvent(startEvent);
@@ -128,6 +139,46 @@ public class ProfilerEventSpyTest {
         // Then
         assertThat(projects).isEmpty();
         assertThat(timers).isEmpty();
+    }
+
+    @Test
+    public void should_start_timer_when_artifact_downloading_start() throws Exception {
+
+        Artifact artifact = artifact();
+        DefaultRepositoryEvent event = aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADING, artifact);
+
+        profiler.onEvent(event);
+
+        assertThat(downloadTimers).containsKey(artifact);
+        assertThat(downloadTimers.get(event.getArtifact()).isRunning()).isTrue();
+    }
+
+    @Test
+    public void should_stop_timer_when_artifact_downloading_finish() throws Exception {
+
+        Artifact artifact = artifact();
+        given_artifact_is_being_downloaded(artifact);
+        DefaultRepositoryEvent event = aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADED, artifact);
+
+        profiler.onEvent(event);
+
+        assertThat(downloadTimers.get(event.getArtifact()).isRunning()).isFalse();
+        assertThat(downloadTimers.get(event.getArtifact()).elapsedMillis()).isPositive();
+    }
+
+    private static Artifact artifact() {
+        return ArtifactProfiled.of(new DefaultArtifact("groupId", "artifactId", "jar", "1.0"));
+    }
+
+    private void given_artifact_is_being_downloaded(Artifact artifact) throws Exception {
+        profiler.onEvent(aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADING, artifact));
+        TimeUnit.MILLISECONDS.sleep(1);
+    }
+
+    private static DefaultRepositoryEvent aRepositoryEvent(RepositoryEvent.EventType type, Artifact artifact) {
+        DefaultRepositoryEvent event = new DefaultRepositoryEvent(type, new DefaultRepositorySystemSession(), new DefaultRequestTrace(null));
+        event.setArtifact(artifact);
+        return event;
     }
 
     private static MavenProject aMavenProject(String name) {
