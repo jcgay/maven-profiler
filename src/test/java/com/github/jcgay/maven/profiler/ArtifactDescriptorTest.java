@@ -3,13 +3,16 @@ package com.github.jcgay.maven.profiler;
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Strings;
 import org.sonatype.aether.artifact.Artifact;
+import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.testng.annotations.Test;
 
 import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import static com.github.jcgay.maven.profiler.KnownElapsedTimeTicker.aStopWatchWithElapsedTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ArtifactDescriptorTest {
@@ -32,6 +35,23 @@ public class ArtifactDescriptorTest {
 
         assertThat(ArtifactDescriptor.instance(Collections.<Artifact, Stopwatch>emptyMap()).maxLength).isZero();
         assertThat(ArtifactDescriptor.instance(null).maxLength).isZero();
+    }
+
+    @Test
+    public void should_get_total_time_spent_downloading_thing() throws Exception {
+
+        HashMap<Artifact, Stopwatch> timers = new HashMap<Artifact, Stopwatch>();
+        timers.put(anArtifact("1"), aStopWatchWithElapsedTime(TimeUnit.SECONDS.toNanos(1L)));
+        timers.put(anArtifact("2"), aStopWatchWithElapsedTime(TimeUnit.SECONDS.toNanos(2L)));
+        timers.put(anArtifact("3"), aStopWatchWithElapsedTime(TimeUnit.SECONDS.toNanos(3L)));
+
+        ArtifactDescriptor result = ArtifactDescriptor.instance(timers);
+
+        assertThat(result.getTotalTimeSpentDownloadingArtifacts().elapsedTime(TimeUnit.SECONDS)).isEqualTo(6L);
+    }
+
+    private static Artifact anArtifact(String artifactId) {
+        return new DefaultArtifact("groupId", artifactId, "extension", "version");
     }
 
     private static Artifact artifactWithSize(final int size) {

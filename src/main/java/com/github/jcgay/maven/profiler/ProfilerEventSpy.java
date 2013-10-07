@@ -159,5 +159,6 @@ public class ProfilerEventSpy extends AbstractEventSpy {
         for (Artifact artifact : ProjectsSorter.byExecutionTime(downloadTimers)) {
             logger.info(descriptor.getFormattedLine(artifact) + downloadTimers.get(artifact));
         }
+        logger.info("Total Time: " + descriptor.getTotalTimeSpentDownloadingArtifacts());
     }
 }

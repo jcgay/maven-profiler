@@ -7,30 +7,51 @@ import com.google.common.collect.Ordering;
 import org.sonatype.aether.artifact.Artifact;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import static com.github.jcgay.maven.profiler.KnownElapsedTimeTicker.aStopWatchWithElapsedTime;
+import static com.google.common.base.Predicates.notNull;
+import static com.google.common.collect.Iterables.filter;
 
 public class ArtifactDescriptor {
 
     @VisibleForTesting final int maxLength;
+    private final Stopwatch totalStopwatch;
 
-    private ArtifactDescriptor(int maxLength) {
+    private ArtifactDescriptor(int maxLength, long totalTime) {
         this.maxLength = maxLength;
+        this.totalStopwatch = aStopWatchWithElapsedTime(totalTime);
     }
 
     public static ArtifactDescriptor instance(Map<Artifact, Stopwatch> times) {
         if (times == null || times.isEmpty()) {
-            return new ArtifactDescriptor(0);
+            return new ArtifactDescriptor(0, 0);
         }
 
-        return new ArtifactDescriptor(
-                ArtifactFunction.toLength().apply(
-                        Ordering.natural()
-                                .onResultOf(ArtifactFunction.toLength())
-                                .max(times.keySet()))
-        );
+        return new ArtifactDescriptor(maxToStringSize(times), totalTime(times));
+    }
+
+    private static long totalTime(Map<Artifact, Stopwatch> times) {
+        long totalTime = 0;
+        for (Stopwatch stopwatch : filter(times.values(), notNull())) {
+            totalTime += stopwatch.elapsedTime(TimeUnit.NANOSECONDS);
+        }
+        return totalTime;
+    }
+
+    private static Integer maxToStringSize(Map<Artifact, Stopwatch> times) {
+        return ArtifactFunction.toLength().apply(
+                Ordering.natural()
+                        .onResultOf(ArtifactFunction.toLength())
+                        .max(times.keySet()));
     }
 
     public String getFormattedLine(Artifact artifact) {
         return String.format("%-" + maxLength + "s ", artifact);
+    }
+
+    public Stopwatch getTotalTimeSpentDownloadingArtifacts() {
+        return totalStopwatch;
     }
 
     private static class ArtifactFunction implements Function<Artifact, Integer> {
