@@ -6,6 +6,7 @@ import org.sonatype.aether.artifact.Artifact;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +25,13 @@ public class ArtifactDescriptorTest {
         ArtifactDescriptor result = ArtifactDescriptor.instance(timers);
 
         assertThat(result.maxLength).isEqualTo(10);
+    }
+
+    @Test
+    public void should_not_fail_when_input_map_is_null_or_empty() throws Exception {
+
+        assertThat(ArtifactDescriptor.instance(Collections.<Artifact, Stopwatch>emptyMap()).maxLength).isZero();
+        assertThat(ArtifactDescriptor.instance(null).maxLength).isZero();
     }
 
     private static Artifact artifactWithSize(final int size) {

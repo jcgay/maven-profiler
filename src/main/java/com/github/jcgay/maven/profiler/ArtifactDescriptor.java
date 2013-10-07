@@ -17,6 +17,10 @@ public class ArtifactDescriptor {
     }
 
     public static ArtifactDescriptor instance(Map<Artifact, Stopwatch> times) {
+        if (times == null || times.isEmpty()) {
+            return new ArtifactDescriptor(0);
+        }
+
         return new ArtifactDescriptor(
                 ArtifactFunction.toLength().apply(
                         Ordering.natural()
