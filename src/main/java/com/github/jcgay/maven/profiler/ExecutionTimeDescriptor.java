@@ -19,7 +19,9 @@ public class ExecutionTimeDescriptor {
 
     private ExecutionTimeDescriptor(Table<MavenProject, MojoExecution, Stopwatch> timers) {
         this.timers = timers;
-        this.maxKeyLength = maxToStringLength(timers.columnKeySet());
+        if (!timers.isEmpty()) {
+            this.maxKeyLength = maxToStringLength(timers.columnKeySet());
+        }
     }
 
     public String getFormattedLine(Map.Entry<MojoExecution, Stopwatch> entry) {

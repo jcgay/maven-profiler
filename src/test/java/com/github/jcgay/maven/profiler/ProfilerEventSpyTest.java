@@ -10,6 +10,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
+import org.mockito.Mockito;
 import org.sonatype.aether.RepositoryEvent;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.util.DefaultRepositorySystemSession;
@@ -24,8 +25,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
+import static com.github.jcgay.maven.profiler.ProfilerEventSpy.PROFILE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.guava.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 public class ProfilerEventSpyTest {
 
@@ -126,25 +130,30 @@ public class ProfilerEventSpyTest {
     public void should_not_log_time_when_property_profile_is_not_set() throws Exception {
 
         // Given
-        System.setProperty("profile", "false");
+        System.setProperty(PROFILE, "false");
 
         ExecutionEvent startEvent = aMojoEvent(ExecutionEvent.Type.MojoSucceeded, aMavenProject("a-project"));
         ExecutionEvent endEvent = aMojoEvent(ExecutionEvent.Type.MojoSucceeded, aMavenProject("a-project"));
+        DefaultRepositoryEvent startDownloadEvent = aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADING, anArtifact());
+        DefaultRepositoryEvent endDownloadEvent = aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADED, anArtifact());
         ProfilerEventSpy spy = new ProfilerEventSpy(logger, projects, timers, downloadTimers);
 
         // When
         spy.onEvent(startEvent);
         spy.onEvent(endEvent);
+        spy.onEvent(startDownloadEvent);
+        spy.onEvent(endDownloadEvent);
 
         // Then
         assertThat(projects).isEmpty();
         assertThat(timers).isEmpty();
+        assertThat(downloadTimers).isEmpty();
     }
 
     @Test
     public void should_start_timer_when_artifact_downloading_start() throws Exception {
 
-        Artifact artifact = artifact();
+        Artifact artifact = anArtifact();
         DefaultRepositoryEvent event = aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADING, artifact);
 
         profiler.onEvent(event);
@@ -156,7 +165,7 @@ public class ProfilerEventSpyTest {
     @Test
     public void should_stop_timer_when_artifact_downloading_finish() throws Exception {
 
-        Artifact artifact = artifact();
+        Artifact artifact = anArtifact();
         given_artifact_is_being_downloaded(artifact);
         DefaultRepositoryEvent event = aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADED, artifact);
 
@@ -166,7 +175,23 @@ public class ProfilerEventSpyTest {
         assertThat(downloadTimers.get(event.getArtifact()).elapsedMillis()).isPositive();
     }
 
-    private static Artifact artifact() {
+    @Test
+    public void should_not_log_download_time_if_nothing_has_been_downloaded() throws Exception {
+
+        // Given
+        System.setProperty(PROFILE, "true");
+        Logger mockLogger = mock(Logger.class);
+
+        ProfilerEventSpy spy = new ProfilerEventSpy(mockLogger, projects, timers, downloadTimers);
+
+        // When
+        spy.close();
+
+        // Then
+        verify(mockLogger).info("No new artifact downloaded...");
+    }
+
+    private static Artifact anArtifact() {
         return ArtifactProfiled.of(new DefaultArtifact("groupId", "artifactId", "jar", "1.0"));
     }
 

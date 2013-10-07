@@ -22,6 +22,8 @@ import java.util.concurrent.ConcurrentMap;
 @Component(role = EventSpy.class, hint = "profiler", description = "Measure times taken by Maven.")
 public class ProfilerEventSpy extends AbstractEventSpy {
 
+    static final String PROFILE = "profile";
+
     @Requirement
     private Logger logger;
 
@@ -31,7 +33,7 @@ public class ProfilerEventSpy extends AbstractEventSpy {
     private boolean isActive;
 
     public ProfilerEventSpy() {
-        String parameter = System.getProperty("profile");
+        String parameter = System.getProperty(PROFILE);
         isActive = parameter != null && !"false".equalsIgnoreCase(parameter);
     }
 
@@ -146,6 +148,10 @@ public class ProfilerEventSpy extends AbstractEventSpy {
     }
 
     private void printDownloadTime() {
+        if (downloadTimers.isEmpty()) {
+            logger.info("No new artifact downloaded...");
+            return;
+        }
         separator();
         logger.info("DOWNLOADING TIME");
         separator();
