@@ -12,6 +12,8 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.sonatype.aether.RepositoryEvent;
 import org.sonatype.aether.artifact.Artifact;
+import org.sonatype.aether.repository.RemoteRepository;
+import org.sonatype.aether.transfer.ArtifactNotFoundException;
 import org.sonatype.aether.util.DefaultRepositorySystemSession;
 import org.sonatype.aether.util.DefaultRequestTrace;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
@@ -175,6 +177,18 @@ public class ProfilerEventSpyTest {
     }
 
     @Test
+    public void should_not_stop_timer_if_artifact_has_not_been_downloaded() throws Exception {
+
+        Artifact artifact = anArtifact();
+        given_artifact_is_being_downloaded(artifact);
+        DefaultRepositoryEvent event = artifact_downloaded_but_not_found(artifact);
+
+        profiler.onEvent(event);
+
+        assertThat(downloadTimers.get(event.getArtifact()).isRunning()).isTrue();
+    }
+
+    @Test
     public void should_not_log_download_time_if_nothing_has_been_downloaded() throws Exception {
 
         // Given
@@ -188,6 +202,12 @@ public class ProfilerEventSpyTest {
 
         // Then
         verify(mockLogger).info("No new artifact downloaded...");
+    }
+
+    private static DefaultRepositoryEvent artifact_downloaded_but_not_found(Artifact artifact) {
+        DefaultRepositoryEvent event = aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADED, artifact);
+        event.setException(new ArtifactNotFoundException(artifact, new RemoteRepository()));
+        return event;
     }
 
     private static Artifact anArtifact() {

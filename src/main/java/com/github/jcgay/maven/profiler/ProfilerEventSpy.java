@@ -15,6 +15,7 @@ import org.codehaus.plexus.logging.Logger;
 import org.sonatype.aether.RepositoryEvent;
 import org.sonatype.aether.artifact.Artifact;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -82,8 +83,15 @@ public class ProfilerEventSpy extends AbstractEventSpy {
     }
 
     private void stopDownload(RepositoryEvent event) {
-        logger.debug(String.format("Stopping timer for artifact [%s]", event.getArtifact()));
-        downloadTimers.get(ArtifactProfiled.of(event.getArtifact())).stop();
+        if (hasNoException(event)) {
+            logger.debug(String.format("Stopping timer for artifact [%s]", event.getArtifact()));
+            downloadTimers.get(ArtifactProfiled.of(event.getArtifact())).stop();
+        }
+    }
+
+    private static boolean hasNoException(RepositoryEvent event) {
+        List<Exception> exceptions = event.getExceptions();
+        return exceptions == null || exceptions.isEmpty();
     }
 
     private void startDownload(RepositoryEvent event) {
