@@ -1,5 +1,8 @@
 package com.github.jcgay.maven.profiler;
 
+import com.github.jcgay.maven.profiler.template.Data;
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.HashBasedTable;
@@ -15,10 +18,17 @@ import org.codehaus.plexus.logging.Logger;
 import org.sonatype.aether.RepositoryEvent;
 import org.sonatype.aether.artifact.Artifact;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import static com.google.common.io.Closeables.closeQuietly;
 
 @Component(role = EventSpy.class, hint = "profiler", description = "Measure times taken by Maven.")
 public class ProfilerEventSpy extends AbstractEventSpy {
@@ -32,6 +42,7 @@ public class ProfilerEventSpy extends AbstractEventSpy {
     private Table<MavenProject, MojoExecution, Stopwatch> timers = HashBasedTable.create();
     private ConcurrentMap<Artifact, Stopwatch> downloadTimers = new ConcurrentHashMap<Artifact, Stopwatch>();
     private boolean isActive;
+    private MavenProject topProject;
 
     public ProfilerEventSpy() {
         String parameter = System.getProperty(PROFILE);
@@ -42,12 +53,14 @@ public class ProfilerEventSpy extends AbstractEventSpy {
     ProfilerEventSpy(Logger logger,
                      ConcurrentHashMap<MavenProject, Stopwatch> projects,
                      Table<MavenProject, MojoExecution, Stopwatch> timers,
-                     ConcurrentMap<Artifact, Stopwatch> downloadTimers) {
+                     ConcurrentMap<Artifact, Stopwatch> downloadTimers,
+                     MavenProject topProject) {
         this();
         this.logger = logger;
         this.projects = projects;
         this.timers = timers;
         this.downloadTimers = downloadTimers;
+        this.topProject = topProject;
     }
 
     @Override
@@ -55,6 +68,7 @@ public class ProfilerEventSpy extends AbstractEventSpy {
         if (isActive) {
             if (event instanceof ExecutionEvent) {
                 saveTime((ExecutionEvent) event);
+                setProject((ExecutionEvent) event);
             } else if (event instanceof RepositoryEvent) {
                 logDownloadingTime((RepositoryEvent) event);
             }
@@ -63,13 +77,60 @@ public class ProfilerEventSpy extends AbstractEventSpy {
         super.onEvent(event);
     }
 
+    private void setProject(ExecutionEvent event) {
+        if (event.getType() == ExecutionEvent.Type.SessionStarted) {
+            this.topProject = event.getProject();
+        }
+    }
+
     @Override
     public void close() throws Exception {
         if (isActive) {
-            printTime();
-            printDownloadTime();
+            logReport();
+            writeHtmlReport();
         }
         super.close();
+    }
+
+    private void writeHtmlReport() {
+        HtmlExecution executions = new HtmlExecution();
+        renderExecution(executions);
+
+        HtmlDownload downloads = new HtmlDownload();
+        renderDownload(downloads);
+
+        String now = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
+        Data context = new Data()
+                .setProjects(executions.getProjects())
+                .setDownloads(downloads.getDownloads())
+                .setTotalDownloadTime(downloads.getTotalTime())
+                .setDate(now)
+                .setName(topProject.getName());
+
+        Handlebars handlebars = new Handlebars();
+        FileWriter writer = null;
+        try {
+            Template template = handlebars.compile("report-template");
+            writer = new FileWriter(getOuputDestination(now));
+            writer.write(template.apply(context));
+        } catch (IOException e) {
+            logger.error("Cannot render profiler report.", e);
+        } finally {
+            closeQuietly(writer);
+        }
+    }
+
+    private File getOuputDestination(String now) {
+        File directory = new File(topProject.getBasedir(), ".profiler");
+        if (!directory.exists() && !directory.mkdirs()) {
+            throw new RuntimeException("Cannot create file to write profiler report: " + directory);
+        }
+        return new File(directory, "profiler-report-" + now + ".html");
+    }
+
+    private void logReport() {
+        renderExecution(new LogExecution(logger));
+        renderDownload(new LogDownload(logger, downloadTimers));
     }
 
     private void logDownloadingTime(RepositoryEvent event) {
@@ -139,34 +200,26 @@ public class ProfilerEventSpy extends AbstractEventSpy {
         projects.put(currentProject, new Stopwatch().start());
     }
 
-    private void printTime() {
-        logger.info("EXECUTION TIME");
-        separator();
+    private void renderExecution(ExecutionRendering target) {
+        target.title();
+        target.separator();
         ExecutionTimeDescriptor descriptor = ExecutionTimeDescriptor.instance(timers);
         for (MavenProject project : ProjectsSorter.byExecutionTime(projects)) {
-            logger.info(project.getName() + ": " + projects.get(project));
+            target.projectSummary(project.getName(), projects.get(project));
             for (Map.Entry<MojoExecution, Stopwatch> mojo : descriptor.getSortedMojosByTime(project)) {
-                logger.info(descriptor.getFormattedLine(mojo));
+                target.mojoExecution(mojo, descriptor);
             }
         }
     }
 
-    private void separator() {
-        logger.info("------------------------------------------------------------------------");
-    }
-
-    private void printDownloadTime() {
-        if (downloadTimers.isEmpty()) {
-            logger.info("No new artifact downloaded...");
-            return;
-        }
-        separator();
-        logger.info("DOWNLOADING TIME");
-        separator();
+    private void renderDownload(DownloadRendering target) {
+        target.separator();
+        target.title();
+        target.separator();
         ArtifactDescriptor descriptor = ArtifactDescriptor.instance(downloadTimers);
         for (Artifact artifact : ProjectsSorter.byExecutionTime(downloadTimers)) {
-            logger.info(descriptor.getFormattedLine(artifact) + downloadTimers.get(artifact));
+            target.artifactTime(artifact, downloadTimers.get(artifact), descriptor);
         }
-        logger.info("Total Time: " + descriptor.getTotalTimeSpentDownloadingArtifacts());
+        target.totalTime(descriptor.getTotalTimeSpentDownloadingArtifacts());
     }
 }

@@ -8,6 +8,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
+import org.assertj.core.api.Condition;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.sonatype.aether.RepositoryEvent;
@@ -22,6 +23,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
@@ -39,6 +41,7 @@ public class ProfilerEventSpyTest {
     private ConcurrentMap<Artifact, Stopwatch> downloadTimers;
     private ConcurrentHashMap<MavenProject, Stopwatch> projects;
     private Logger logger;
+    private MavenProject topProject;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -48,12 +51,16 @@ public class ProfilerEventSpyTest {
         projects = new ConcurrentHashMap<MavenProject, Stopwatch>();
         logger = new ConsoleLogger();
 
+        topProject = aMavenProject("top-project");
+        topProject.setFile(File.createTempFile("pom", ".xml"));
+
         System.setProperty("profile", "true");
         profiler = new ProfilerEventSpy(
                 logger,
                 projects,
                 timers,
-                downloadTimers
+                downloadTimers,
+                topProject
         );
     }
 
@@ -137,7 +144,7 @@ public class ProfilerEventSpyTest {
         ExecutionEvent endEvent = aMojoEvent(ExecutionEvent.Type.MojoSucceeded, aMavenProject("a-project"));
         DefaultRepositoryEvent startDownloadEvent = aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADING, anArtifact());
         DefaultRepositoryEvent endDownloadEvent = aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADED, anArtifact());
-        ProfilerEventSpy spy = new ProfilerEventSpy(logger, projects, timers, downloadTimers);
+        ProfilerEventSpy spy = new ProfilerEventSpy(logger, projects, timers, downloadTimers, topProject);
 
         // When
         spy.onEvent(startEvent);
@@ -195,13 +202,35 @@ public class ProfilerEventSpyTest {
         System.setProperty(PROFILE, "true");
         Logger mockLogger = mock(Logger.class);
 
-        ProfilerEventSpy spy = new ProfilerEventSpy(mockLogger, projects, timers, downloadTimers);
+        ProfilerEventSpy spy = new ProfilerEventSpy(mockLogger, projects, timers, downloadTimers, topProject);
 
         // When
         spy.close();
 
         // Then
         verify(mockLogger).info("No new artifact downloaded...");
+    }
+
+    @Test
+    public void should_write_html_report() throws Exception {
+
+        MavenProject project = aMavenProject("a-project");
+        given_project_has_start();
+        given_event_has_start(aMojoEvent(ExecutionEvent.Type.MojoStarted, project));
+        profiler.onEvent(aMojoEvent(ExecutionEvent.Type.MojoStarted, project));
+        profiler.onEvent(aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADING, anArtifact()));
+
+        profiler.close();
+
+        File destination = new File(topProject.getFile().getParentFile(), ".profiler");
+        assertThat(destination).exists().isDirectory();
+        assertThat(destination.list()).haveAtLeast(1, new Condition<String>() {
+            @Override
+            public boolean matches(String value) {
+                return value.startsWith("profiler-report-") && value.endsWith(".html");
+            }
+        });
+
     }
 
     private static DefaultRepositoryEvent artifact_downloaded_but_not_found(Artifact artifact) {
