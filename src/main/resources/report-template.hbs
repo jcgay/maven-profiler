@@ -3,6 +3,53 @@
 <head>
     <meta charset="utf-8">
     <title>Maven Profiler report</title>
+    <style>
+        body {
+            padding: 30px 50px;
+        }
+        h1 {
+            font-size: 160%;
+            margin-bottom: 10px;
+        }
+        h2 {
+            font-size: 120%;
+        }
+        table {
+            min-width: 350px;
+            border-collapse: collapse;
+        }
+        th, table {
+            border-bottom: solid #d0d0d0 1px;
+        }
+        th {
+            text-align: left;
+            white-space: nowrap;
+            padding-left: 6em;
+        }
+        th:first-child {
+            padding-left: 0;
+        }
+        td {
+            white-space: nowrap;
+            padding-left: 6em;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        td:first-child {
+            padding-left: 0;
+        }
+        td.time, th.time {
+            text-align: right;
+        }
+        footer {
+            margin-top: 100px;
+            font-size: 80%;
+            white-space: nowrap;
+        }
+        footer, footer a {
+            color: #a0a0a0;
+        }
+    </style>
 </head>
 <body>
     <section>
@@ -11,17 +58,17 @@
 
         {{#projects}}
         <article>
-            <h1>{{name}} - {{time}}</h1>
+            <h2>{{name}} - {{time}}</h2>
             <table>
                 <thead>
                 <th>Plugin execution</th>
-                <th>Duration</th>
+                <th class="time">Duration</th>
                 </thead>
                 <tbody>
                 {{#mojosWithTime}}
                 <tr>
                     <td>{{entry}}</td>
-                    <td>{{time}}</td>
+                    <td class="time">{{time}}</td>
                 </tr>
                 {{/mojosWithTime}}
                 </tbody>
@@ -31,17 +78,17 @@
 
         {{#downloadSectionDisplayed}}
         <article>
-            <h1>Artifact Downloading</h1>
+            <h2>Artifact Downloading</h2>
             <table>
                 <thead>
                 <th>Artifact</th>
-                <th>Duration</th>
+                <th class="time">Duration</th>
                 </thead>
                 <tbody>
                 {{#downloads}}
                     <tr>
                         <td>{{entry}}</td>
-                        <td>{{time}}</td>
+                        <td class="time">{{time}}</td>
                     </tr>
                 {{/downloads}}
                 </tbody>
