@@ -185,7 +185,7 @@ public class ProfilerEventSpy extends AbstractEventSpy {
 
     private void startMojo(ExecutionEvent currentEvent, MavenProject currentProject) {
         logger.debug(String.format("Starting timer for mojo [%s] in project [%s].", currentEvent.getMojoExecution(), currentProject));
-        synchronized (currentEvent) {
+        synchronized (timers) {
             timers.put(currentProject, currentEvent.getMojoExecution(), new Stopwatch().start());
         }
     }
