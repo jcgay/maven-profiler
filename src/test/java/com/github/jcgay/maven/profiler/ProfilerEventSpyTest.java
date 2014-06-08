@@ -31,8 +31,6 @@ import java.util.concurrent.TimeUnit;
 import static com.github.jcgay.maven.profiler.ProfilerEventSpy.PROFILE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.guava.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 public class ProfilerEventSpyTest {
 
@@ -193,22 +191,6 @@ public class ProfilerEventSpyTest {
         profiler.onEvent(event);
 
         assertThat(downloadTimers.get(event.getArtifact()).isRunning()).isTrue();
-    }
-
-    @Test
-    public void should_not_log_download_time_if_nothing_has_been_downloaded() throws Exception {
-
-        // Given
-        System.setProperty(PROFILE, "true");
-        Logger mockLogger = mock(Logger.class);
-
-        ProfilerEventSpy spy = new ProfilerEventSpy(mockLogger, projects, timers, downloadTimers, topProject);
-
-        // When
-        spy.close();
-
-        // Then
-        verify(mockLogger).info("No new artifact downloaded...");
     }
 
     @Test

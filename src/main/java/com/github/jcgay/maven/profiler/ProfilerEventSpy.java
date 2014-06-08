@@ -86,7 +86,6 @@ public class ProfilerEventSpy extends AbstractEventSpy {
     @Override
     public void close() throws Exception {
         if (isActive) {
-            logReport();
             writeHtmlReport();
         }
         super.close();
@@ -126,11 +125,6 @@ public class ProfilerEventSpy extends AbstractEventSpy {
             throw new RuntimeException("Cannot create file to write profiler report: " + directory);
         }
         return new File(directory, "profiler-report-" + now + ".html");
-    }
-
-    private void logReport() {
-        renderExecution(new LogExecution(logger));
-        renderDownload(new LogDownload(logger, downloadTimers));
     }
 
     private void logDownloadingTime(RepositoryEvent event) {

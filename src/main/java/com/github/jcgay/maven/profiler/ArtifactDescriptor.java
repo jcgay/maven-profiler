@@ -46,10 +46,6 @@ public class ArtifactDescriptor {
                         .max(times.keySet()));
     }
 
-    public String getFormattedLine(Artifact artifact) {
-        return String.format("%-" + maxLength + "s ", artifact);
-    }
-
     public Stopwatch getTotalTimeSpentDownloadingArtifacts() {
         return totalStopwatch;
     }

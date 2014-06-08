@@ -24,10 +24,6 @@ public class ExecutionTimeDescriptor {
         }
     }
 
-    public String getFormattedLine(Map.Entry<MojoExecution, Stopwatch> entry) {
-        return String.format(String.format("%-" + maxKeyLength + "s %s", entry.getKey(), entry.getValue()));
-    }
-
     public static ExecutionTimeDescriptor instance(Table<MavenProject, MojoExecution, Stopwatch> timers) {
         return new ExecutionTimeDescriptor(timers);
     }
