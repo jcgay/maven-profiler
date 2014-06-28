@@ -9,7 +9,7 @@ import com.google.common.primitives.Longs;
 import java.util.List;
 import java.util.Map;
 
-public class ProjectsSorter {
+class ProjectsSorter {
 
     private ProjectsSorter() {
         // Prevents instantiation.

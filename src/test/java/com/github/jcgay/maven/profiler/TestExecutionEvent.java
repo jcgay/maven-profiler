@@ -11,7 +11,7 @@ import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.sonatype.aether.util.DefaultRepositorySystemSession;
 
-public class TestExecutionEvent implements ExecutionEvent {
+class TestExecutionEvent implements ExecutionEvent {
 
     private MavenSession session;
     private Type type;
