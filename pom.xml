@@ -7,7 +7,7 @@
     <version>0.2-SNAPSHOT</version>
 
     <prerequisites>
-        <maven>2.2.1</maven>
+        <maven>3.0</maven>
     </prerequisites>
 
     <scm>
