@@ -1,6 +1,8 @@
 package com.github.jcgay.maven.profiler;
 
 import com.github.jcgay.maven.profiler.template.Data;
+import com.github.jcgay.maven.profiler.template.EntryAndTime;
+import com.github.jcgay.maven.profiler.template.Project;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.google.common.annotations.VisibleForTesting;
@@ -22,6 +24,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -65,19 +68,18 @@ public class ProfilerEventSpy extends AbstractEventSpy {
 
     @Override
     public void onEvent(Object event) throws Exception {
+        super.onEvent(event);
         if (isActive) {
             if (event instanceof ExecutionEvent) {
-                saveTime((ExecutionEvent) event);
-                setProject((ExecutionEvent) event);
+                saveExecutionTime((ExecutionEvent) event);
+                saveProject((ExecutionEvent) event);
             } else if (event instanceof RepositoryEvent) {
-                logDownloadingTime((RepositoryEvent) event);
+                saveDownloadingTime((RepositoryEvent) event);
             }
-
         }
-        super.onEvent(event);
     }
 
-    private void setProject(ExecutionEvent event) {
+    private void saveProject(ExecutionEvent event) {
         if (event.getType() == ExecutionEvent.Type.SessionStarted) {
             this.topProject = event.getProject();
         }
@@ -85,38 +87,56 @@ public class ProfilerEventSpy extends AbstractEventSpy {
 
     @Override
     public void close() throws Exception {
-        if (isActive) {
-            writeHtmlReport();
-        }
         super.close();
+        if (isActive) {
+            writeReport();
+        }
     }
 
-    private void writeHtmlReport() {
-        HtmlExecution executions = new HtmlExecution();
-        renderExecution(executions);
+    private void writeReport() {
 
-        HtmlDownload downloads = new HtmlDownload();
-        renderDownload(downloads);
+        Date now = new Date();
 
-        String now = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
         Data context = new Data()
-                .setProjects(executions.getProjects())
-                .setDownloads(downloads.getDownloads())
-                .setTotalDownloadTime(downloads.getTotalTime())
-                .setDate(now)
+                .setProjects(allProjects())
+                .setDate(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(now))
                 .setName(topProject.getName());
+        setDownloads(context);
 
         Handlebars handlebars = new Handlebars();
         FileWriter writer = null;
         try {
             Template template = handlebars.compile("report-template");
-            writer = new FileWriter(getOuputDestination(now));
+            writer = new FileWriter(getOuputDestination(new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(now)));
             writer.write(template.apply(context));
         } catch (IOException e) {
             logger.error("Cannot render profiler report.", e);
         } finally {
             closeQuietly(writer);
         }
+    }
+
+    private List<Project> allProjects() {
+        List<Project> result = new ArrayList<Project>();
+        ExecutionTimeDescriptor descriptor = ExecutionTimeDescriptor.instance(timers);
+        for (MavenProject project : ProjectsSorter.byExecutionTime(projects)) {
+            Project currentProject = new Project(project.getName(), projects.get(project));
+            for (Map.Entry<MojoExecution, Stopwatch> mojo : descriptor.getSortedMojosByTime(project)) {
+                currentProject.addMojoTime(new EntryAndTime<MojoExecution>(mojo.getKey(), mojo.getValue()));
+            }
+            result.add(currentProject);
+        }
+        return result;
+    }
+
+    private void setDownloads(Data data) {
+        List<EntryAndTime<Artifact>> result = new ArrayList<EntryAndTime<Artifact>>();
+        ArtifactDescriptor descriptor = ArtifactDescriptor.instance(downloadTimers);
+        for (Artifact artifact : ProjectsSorter.byExecutionTime(downloadTimers)) {
+            result.add(new EntryAndTime<Artifact>(artifact, downloadTimers.get(artifact)));
+        }
+        data.setDownloads(result)
+            .setTotalDownloadTime(descriptor.getTotalTimeSpentDownloadingArtifacts());
     }
 
     private File getOuputDestination(String now) {
@@ -127,7 +147,7 @@ public class ProfilerEventSpy extends AbstractEventSpy {
         return new File(directory, "profiler-report-" + now + ".html");
     }
 
-    private void logDownloadingTime(RepositoryEvent event) {
+    private void saveDownloadingTime(RepositoryEvent event) {
         logger.debug(String.format("Received event (%s): %s", event.getClass(), event));
         if (event.getType() == RepositoryEvent.EventType.ARTIFACT_DOWNLOADING) {
             startDownload(event);
@@ -154,7 +174,7 @@ public class ProfilerEventSpy extends AbstractEventSpy {
         downloadTimers.putIfAbsent(ArtifactProfiled.of(event.getArtifact()), new Stopwatch().start());
     }
 
-    private void saveTime(ExecutionEvent event) {
+    private void saveExecutionTime(ExecutionEvent event) {
         logger.debug(String.format("Received event (%s): %s", event.getClass(), event));
         ExecutionEvent.Type type = event.getType();
         MavenProject currentProject = event.getSession().getCurrentProject();
@@ -192,28 +212,5 @@ public class ProfilerEventSpy extends AbstractEventSpy {
     private void startProject(MavenProject currentProject) {
         logger.debug("Starting timer for project: " + currentProject);
         projects.put(currentProject, new Stopwatch().start());
-    }
-
-    private void renderExecution(ExecutionRendering target) {
-        target.title();
-        target.separator();
-        ExecutionTimeDescriptor descriptor = ExecutionTimeDescriptor.instance(timers);
-        for (MavenProject project : ProjectsSorter.byExecutionTime(projects)) {
-            target.projectSummary(project.getName(), projects.get(project));
-            for (Map.Entry<MojoExecution, Stopwatch> mojo : descriptor.getSortedMojosByTime(project)) {
-                target.mojoExecution(mojo, descriptor);
-            }
-        }
-    }
-
-    private void renderDownload(DownloadRendering target) {
-        target.separator();
-        target.title();
-        target.separator();
-        ArtifactDescriptor descriptor = ArtifactDescriptor.instance(downloadTimers);
-        for (Artifact artifact : ProjectsSorter.byExecutionTime(downloadTimers)) {
-            target.artifactTime(artifact, downloadTimers.get(artifact), descriptor);
-        }
-        target.totalTime(descriptor.getTotalTimeSpentDownloadingArtifacts());
     }
 }
