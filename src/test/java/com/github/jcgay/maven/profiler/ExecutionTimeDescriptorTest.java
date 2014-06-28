@@ -89,7 +89,7 @@ public class ExecutionTimeDescriptorTest {
 
     private static class MojoExecution extends Condition<Map.Entry<org.apache.maven.plugin.MojoExecution, Stopwatch>> {
 
-        private String id;
+        private final String id;
 
         private MojoExecution(String id) {
             super("a MojoExecution with ID: " + id);
@@ -108,7 +108,7 @@ public class ExecutionTimeDescriptorTest {
 
     private static class MojoExecutionWithPrintSize extends org.apache.maven.plugin.MojoExecution {
 
-        private int printSize;
+        private final int printSize;
 
         public MojoExecutionWithPrintSize(int printSize) {
             super(new Plugin(), "a-goal", "an-execution-id");

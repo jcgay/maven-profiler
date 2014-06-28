@@ -5,7 +5,7 @@ import com.google.common.base.Ticker;
 
 class KnownElapsedTimeTicker extends Ticker {
 
-    private long expectedElapsedTime;
+    private final long expectedElapsedTime;
     private boolean firstRead;
 
     KnownElapsedTimeTicker(long expectedElapsedTime) {

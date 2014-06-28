@@ -15,7 +15,7 @@ import java.util.Map;
 public class ExecutionTimeDescriptor {
 
     @VisibleForTesting int maxKeyLength;
-    private Table<MavenProject, MojoExecution, Stopwatch> timers;
+    private final Table<MavenProject, MojoExecution, Stopwatch> timers;
 
     private ExecutionTimeDescriptor(Table<MavenProject, MojoExecution, Stopwatch> timers) {
         this.timers = timers;

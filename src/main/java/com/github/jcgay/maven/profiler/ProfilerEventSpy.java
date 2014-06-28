@@ -17,6 +17,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.sonatype.aether.RepositoryEvent;
 import org.sonatype.aether.artifact.Artifact;
 
@@ -41,29 +42,42 @@ public class ProfilerEventSpy extends AbstractEventSpy {
     @Requirement
     private Logger logger;
 
-    private Map<MavenProject, Stopwatch> projects = new ConcurrentHashMap<MavenProject, Stopwatch>();
-    private Table<MavenProject, MojoExecution, Stopwatch> timers = HashBasedTable.create();
-    private ConcurrentMap<Artifact, Stopwatch> downloadTimers = new ConcurrentHashMap<Artifact, Stopwatch>();
-    private boolean isActive;
+    private final Map<MavenProject, Stopwatch> projects;
+    private final Table<MavenProject, MojoExecution, Stopwatch> timers;
+    private final ConcurrentMap<Artifact, Stopwatch> downloadTimers;
+    private final boolean isActive;
     private MavenProject topProject;
 
     public ProfilerEventSpy() {
-        String parameter = System.getProperty(PROFILE);
-        isActive = parameter != null && !"false".equalsIgnoreCase(parameter);
+        this(
+                new ConcurrentHashMap<MavenProject, Stopwatch>(),
+                HashBasedTable.<MavenProject, MojoExecution, Stopwatch>create(),
+                new ConcurrentHashMap<Artifact, Stopwatch>()
+        );
     }
 
-    @VisibleForTesting
-    ProfilerEventSpy(Logger logger,
-                     ConcurrentHashMap<MavenProject, Stopwatch> projects,
-                     Table<MavenProject, MojoExecution, Stopwatch> timers,
-                     ConcurrentMap<Artifact, Stopwatch> downloadTimers,
-                     MavenProject topProject) {
-        this();
-        this.logger = logger;
+    private ProfilerEventSpy(Map<MavenProject, Stopwatch> projects,
+                             Table<MavenProject, MojoExecution, Stopwatch> timers,
+                             ConcurrentMap<Artifact, Stopwatch> downloadTimers) {
         this.projects = projects;
         this.timers = timers;
         this.downloadTimers = downloadTimers;
+        this.isActive = isActive();
+    }
+
+    @VisibleForTesting
+    ProfilerEventSpy(ConcurrentHashMap<MavenProject, Stopwatch> projects,
+                     Table<MavenProject, MojoExecution, Stopwatch> timers,
+                     ConcurrentMap<Artifact, Stopwatch> downloadTimers,
+                     MavenProject topProject) {
+        this(projects, timers, downloadTimers);
         this.topProject = topProject;
+        this.logger = new ConsoleLogger();
+    }
+
+    private boolean isActive() {
+        String parameter = System.getProperty(PROFILE);
+        return parameter != null && !"false".equalsIgnoreCase(parameter);
     }
 
     @Override

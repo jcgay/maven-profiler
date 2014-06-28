@@ -9,8 +9,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.assertj.core.api.Condition;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.sonatype.aether.RepositoryEvent;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.repository.RemoteRepository;
@@ -38,7 +36,6 @@ public class ProfilerEventSpyTest {
     private Table<MavenProject, MojoExecution, Stopwatch> timers;
     private ConcurrentMap<Artifact, Stopwatch> downloadTimers;
     private ConcurrentHashMap<MavenProject, Stopwatch> projects;
-    private Logger logger;
     private MavenProject topProject;
 
     @BeforeMethod
@@ -47,14 +44,12 @@ public class ProfilerEventSpyTest {
         downloadTimers = new ConcurrentHashMap<Artifact, Stopwatch>();
 
         projects = new ConcurrentHashMap<MavenProject, Stopwatch>();
-        logger = new ConsoleLogger();
 
         topProject = aMavenProject("top-project");
         topProject.setFile(File.createTempFile("pom", ".xml"));
 
         System.setProperty("profile", "true");
         profiler = new ProfilerEventSpy(
-                logger,
                 projects,
                 timers,
                 downloadTimers,
@@ -142,7 +137,7 @@ public class ProfilerEventSpyTest {
         ExecutionEvent endEvent = aMojoEvent(ExecutionEvent.Type.MojoSucceeded, aMavenProject("a-project"));
         DefaultRepositoryEvent startDownloadEvent = aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADING, anArtifact());
         DefaultRepositoryEvent endDownloadEvent = aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADED, anArtifact());
-        ProfilerEventSpy spy = new ProfilerEventSpy(logger, projects, timers, downloadTimers, topProject);
+        ProfilerEventSpy spy = new ProfilerEventSpy(projects, timers, downloadTimers, topProject);
 
         // When
         spy.onEvent(startEvent);
