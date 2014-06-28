@@ -4,7 +4,7 @@ A time execution recorder for Maven which log time taken by each mojo in your bu
 
 ##Installation
 
-Get [maven-profiler](http://dl.bintray.com/jcgay/maven/com/github/jcgay/maven/maven-profiler/1.0/maven-profiler-1.O.jar) and copy it in `%M2_HOME%/lib/ext` folder.
+Get [maven-profiler](http://dl.bintray.com/jcgay/maven/com/github/jcgay/maven/maven-profiler/1.0/maven-profiler-1.0.jar) and copy it in `%M2_HOME%/lib/ext` folder.
 
 ##Usage
 
