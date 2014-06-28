@@ -32,10 +32,6 @@ class TestExecutionEvent implements ExecutionEvent {
         return new MavenSession(new DefaultPlexusContainer(), new DefaultRepositorySystemSession(), new DefaultMavenExecutionRequest(), new DefaultMavenExecutionResult());
     }
 
-    public TestExecutionEvent(Type type) {
-        this.type = type;
-    }
-
     @Override
     public Type getType() {
         return this.type;
