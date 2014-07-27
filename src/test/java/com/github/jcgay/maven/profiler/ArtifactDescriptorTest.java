@@ -2,8 +2,8 @@ package com.github.jcgay.maven.profiler;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Strings;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.util.artifact.DefaultArtifact;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
 import org.testng.annotations.Test;
 
 import java.io.File;

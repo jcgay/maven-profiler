@@ -1,7 +1,7 @@
 package com.github.jcgay.maven.profiler;
 
 import com.google.common.base.Objects;
-import org.sonatype.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.Artifact;
 
 import java.io.File;
 import java.util.Map;

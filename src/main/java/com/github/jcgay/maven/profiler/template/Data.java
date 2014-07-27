@@ -1,7 +1,7 @@
 package com.github.jcgay.maven.profiler.template;
 
 import com.google.common.base.Stopwatch;
-import org.sonatype.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.Artifact;
 
 import java.util.List;
 

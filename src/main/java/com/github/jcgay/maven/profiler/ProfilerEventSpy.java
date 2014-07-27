@@ -18,8 +18,8 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
-import org.sonatype.aether.RepositoryEvent;
-import org.sonatype.aether.artifact.Artifact;
+import org.eclipse.aether.RepositoryEvent;
+import org.eclipse.aether.artifact.Artifact;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -31,8 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import static com.google.common.io.Closeables.closeQuietly;
 
 @Component(role = EventSpy.class, hint = "profiler", description = "Measure times taken by Maven.")
 public class ProfilerEventSpy extends AbstractEventSpy {
@@ -126,7 +124,13 @@ public class ProfilerEventSpy extends AbstractEventSpy {
         } catch (IOException e) {
             logger.error("Cannot render profiler report.", e);
         } finally {
-            closeQuietly(writer);
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    // Ignore errors
+                }
+            }
         }
     }
 

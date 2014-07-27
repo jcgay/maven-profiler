@@ -9,14 +9,12 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.assertj.core.api.Condition;
-import org.sonatype.aether.RepositoryEvent;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.transfer.ArtifactNotFoundException;
-import org.sonatype.aether.util.DefaultRepositorySystemSession;
-import org.sonatype.aether.util.DefaultRequestTrace;
-import org.sonatype.aether.util.artifact.DefaultArtifact;
-import org.sonatype.aether.util.listener.DefaultRepositoryEvent;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositoryEvent;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.transfer.ArtifactNotFoundException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -24,9 +22,9 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
 
 import static com.github.jcgay.maven.profiler.ProfilerEventSpy.PROFILE;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.guava.api.Assertions.assertThat;
 
@@ -135,8 +133,8 @@ public class ProfilerEventSpyTest {
 
         ExecutionEvent startEvent = aMojoEvent(ExecutionEvent.Type.MojoSucceeded, aMavenProject("a-project"));
         ExecutionEvent endEvent = aMojoEvent(ExecutionEvent.Type.MojoSucceeded, aMavenProject("a-project"));
-        DefaultRepositoryEvent startDownloadEvent = aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADING, anArtifact());
-        DefaultRepositoryEvent endDownloadEvent = aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADED, anArtifact());
+        RepositoryEvent startDownloadEvent = aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADING, anArtifact()).build();
+        RepositoryEvent endDownloadEvent = aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADED, anArtifact()).build();
         ProfilerEventSpy spy = new ProfilerEventSpy(projects, timers, downloadTimers, topProject);
 
         // When
@@ -155,7 +153,7 @@ public class ProfilerEventSpyTest {
     public void should_start_timer_when_artifact_downloading_start() throws Exception {
 
         Artifact artifact = anArtifact();
-        DefaultRepositoryEvent event = aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADING, artifact);
+        RepositoryEvent event = aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADING, artifact).build();
 
         profiler.onEvent(event);
 
@@ -168,7 +166,7 @@ public class ProfilerEventSpyTest {
 
         Artifact artifact = anArtifact();
         given_artifact_is_being_downloaded(artifact);
-        DefaultRepositoryEvent event = aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADED, artifact);
+        RepositoryEvent event = aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADED, artifact).build();
 
         profiler.onEvent(event);
 
@@ -181,7 +179,7 @@ public class ProfilerEventSpyTest {
 
         Artifact artifact = anArtifact();
         given_artifact_is_being_downloaded(artifact);
-        DefaultRepositoryEvent event = artifact_downloaded_but_not_found(artifact);
+        RepositoryEvent event = artifact_downloaded_but_not_found(artifact).build();
 
         profiler.onEvent(event);
 
@@ -210,10 +208,9 @@ public class ProfilerEventSpyTest {
 
     }
 
-    private static DefaultRepositoryEvent artifact_downloaded_but_not_found(Artifact artifact) {
-        DefaultRepositoryEvent event = aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADED, artifact);
-        event.setException(new ArtifactNotFoundException(artifact, new RemoteRepository()));
-        return event;
+    private static RepositoryEvent.Builder artifact_downloaded_but_not_found(Artifact artifact) {
+        return aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADED, artifact)
+                .setException(new ArtifactNotFoundException(artifact, new RemoteRepository.Builder("", "", "").build()));
     }
 
     private static Artifact anArtifact() {
@@ -221,14 +218,13 @@ public class ProfilerEventSpyTest {
     }
 
     private void given_artifact_is_being_downloaded(Artifact artifact) throws Exception {
-        profiler.onEvent(aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADING, artifact));
-        TimeUnit.MILLISECONDS.sleep(1);
+        profiler.onEvent(aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADING, artifact).build());
+        MILLISECONDS.sleep(1);
     }
 
-    private static DefaultRepositoryEvent aRepositoryEvent(RepositoryEvent.EventType type, Artifact artifact) {
-        DefaultRepositoryEvent event = new DefaultRepositoryEvent(type, new DefaultRepositorySystemSession(), new DefaultRequestTrace(null));
-        event.setArtifact(artifact);
-        return event;
+    private static RepositoryEvent.Builder aRepositoryEvent(RepositoryEvent.EventType type, Artifact artifact) {
+        return new RepositoryEvent.Builder(new DefaultRepositorySystemSession(), type)
+                .setArtifact(artifact);
     }
 
     private static MavenProject aMavenProject(String name) {
@@ -243,12 +239,12 @@ public class ProfilerEventSpyTest {
 
     private void given_project_has_start() throws Exception {
         profiler.onEvent(aProjectEvent(ExecutionEvent.Type.ProjectStarted));
-        TimeUnit.MILLISECONDS.sleep(1);
+        MILLISECONDS.sleep(1);
     }
 
     private void given_event_has_start(ExecutionEvent event) throws Exception {
         profiler.onEvent(aMojoEvent(ExecutionEvent.Type.MojoStarted, event.getMojoExecution(), event.getSession().getCurrentProject()));
-        TimeUnit.MILLISECONDS.sleep(1);
+        MILLISECONDS.sleep(1);
     }
 
     private static ExecutionEvent aMojoEvent(ExecutionEvent.Type type, MavenProject mavenProject) {

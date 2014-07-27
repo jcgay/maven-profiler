@@ -4,7 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Ordering;
-import org.sonatype.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.Artifact;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;

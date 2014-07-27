@@ -9,7 +9,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
-import org.sonatype.aether.util.DefaultRepositorySystemSession;
+import org.eclipse.aether.DefaultRepositorySystemSession;
 
 class TestExecutionEvent implements ExecutionEvent {
 
