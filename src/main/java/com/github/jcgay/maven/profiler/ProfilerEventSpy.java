@@ -6,11 +6,13 @@ import com.github.jcgay.maven.profiler.template.Project;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import org.apache.maven.eventspy.AbstractEventSpy;
 import org.apache.maven.eventspy.EventSpy;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
@@ -29,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -45,6 +48,8 @@ public class ProfilerEventSpy extends AbstractEventSpy {
     private final ConcurrentMap<Artifact, Stopwatch> downloadTimers;
     private final boolean isActive;
     private MavenProject topProject;
+    private List<String> goals = new ArrayList<String>();
+    private Properties properties = new Properties();
 
     public ProfilerEventSpy() {
         this(
@@ -82,7 +87,11 @@ public class ProfilerEventSpy extends AbstractEventSpy {
     public void onEvent(Object event) throws Exception {
         super.onEvent(event);
         if (isActive) {
-            if (event instanceof ExecutionEvent) {
+            if (event instanceof DefaultMavenExecutionRequest) {
+                goals = ((DefaultMavenExecutionRequest) event).getGoals();
+                properties = ((DefaultMavenExecutionRequest) event).getUserProperties();
+            }
+            else if (event instanceof ExecutionEvent) {
                 saveExecutionTime((ExecutionEvent) event);
                 saveProject((ExecutionEvent) event);
             } else if (event instanceof RepositoryEvent) {
@@ -112,7 +121,9 @@ public class ProfilerEventSpy extends AbstractEventSpy {
         Data context = new Data()
                 .setProjects(allProjects())
                 .setDate(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(now))
-                .setName(topProject.getName());
+                .setName(topProject.getName())
+                .setGoals(Joiner.on(' ').join(goals))
+                .setParameters(properties);
         setDownloads(context);
 
         Handlebars handlebars = new Handlebars();
@@ -230,5 +241,13 @@ public class ProfilerEventSpy extends AbstractEventSpy {
     private void startProject(MavenProject currentProject) {
         logger.debug("Starting timer for project: " + currentProject);
         projects.put(currentProject, new Stopwatch().start());
+    }
+
+    List<String> getGoals() {
+        return goals;
+    }
+
+    Properties getProperties() {
+        return properties;
     }
 }

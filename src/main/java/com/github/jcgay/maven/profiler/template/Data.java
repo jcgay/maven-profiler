@@ -4,6 +4,7 @@ import com.google.common.base.Stopwatch;
 import org.eclipse.aether.artifact.Artifact;
 
 import java.util.List;
+import java.util.Properties;
 
 public class Data {
 
@@ -13,6 +14,8 @@ public class Data {
     private Stopwatch buildTime;
     private String date;
     private String name;
+    private String goals;
+    private Properties parameters;
 
     public List<Project> getProjects() {
         return projects;
@@ -42,6 +45,14 @@ public class Data {
         return name;
     }
 
+    public String getGoals() {
+        return goals;
+    }
+
+    public Properties getParameters() {
+        return parameters;
+    }
+
     public Data setProjects(List<Project> projects) {
         this.projects = projects;
         return this;
@@ -69,6 +80,16 @@ public class Data {
 
     public Data setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public Data setGoals(String goals) {
+        this.goals = goals;
+        return this;
+    }
+
+    public Data setParameters(Properties parameters) {
+        this.parameters = parameters;
         return this;
     }
 }

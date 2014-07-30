@@ -3,6 +3,7 @@ package com.github.jcgay.maven.profiler;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -20,10 +21,12 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import static com.github.jcgay.maven.profiler.ProfilerEventSpy.PROFILE;
+import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.guava.api.Assertions.assertThat;
@@ -206,6 +209,19 @@ public class ProfilerEventSpyTest {
             }
         });
 
+    }
+
+    @Test
+    public void should_get_goals() throws Exception {
+
+        DefaultMavenExecutionRequest event = new DefaultMavenExecutionRequest();
+        event.setGoals(asList("clean", "install"));
+        event.setUserProperties(new Properties());
+
+        profiler.onEvent(event);
+
+        assertThat(profiler.getGoals()).containsExactlyElementsOf(event.getGoals());
+        assertThat(profiler.getProperties()).isEqualTo(event.getUserProperties());
     }
 
     private static RepositoryEvent.Builder artifact_downloaded_but_not_found(Artifact artifact) {
