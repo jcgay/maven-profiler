@@ -50,6 +50,8 @@ public class ProfilerEventSpyTest {
         topProject.setFile(File.createTempFile("pom", ".xml"));
 
         System.setProperty("profile", "true");
+        System.clearProperty("profileFormat");
+
         profiler = new ProfilerEventSpy(
                 projects,
                 timers,
@@ -209,6 +211,28 @@ public class ProfilerEventSpyTest {
             }
         });
 
+    }
+
+    @Test
+    public void should_write_json_report() throws Exception {
+        System.setProperty("profileFormat", "json");
+        MavenProject project = aMavenProject("a-project");
+        given_project_has_start();
+        given_event_has_start(aMojoEvent(ExecutionEvent.Type.MojoStarted, project));
+        profiler.onEvent(aMojoEvent(ExecutionEvent.Type.MojoStarted, project));
+        profiler.onEvent(aRepositoryEvent(RepositoryEvent.EventType.ARTIFACT_DOWNLOADING, anArtifact()));
+
+        profiler.close();
+
+        File destination = new File(topProject.getFile().getParentFile(), ".profiler");
+        assertThat(destination).exists().isDirectory();
+        assertThat(destination.list()).haveAtLeast(1, new Condition<String>() {
+            @Override
+            public boolean matches(String value) {
+                return value.startsWith("profiler-report-") && value.endsWith(".json");
+            }
+        });
+        System.clearProperty("profileFormat");
     }
 
     @Test
