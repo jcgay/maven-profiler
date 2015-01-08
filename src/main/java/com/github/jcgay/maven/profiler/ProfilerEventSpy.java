@@ -1,5 +1,7 @@
 package com.github.jcgay.maven.profiler;
 
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
 import com.github.jcgay.maven.profiler.template.Data;
 import com.github.jcgay.maven.profiler.template.EntryAndTime;
 import com.github.jcgay.maven.profiler.template.Project;
@@ -39,6 +41,7 @@ import java.util.concurrent.ConcurrentMap;
 public class ProfilerEventSpy extends AbstractEventSpy {
 
     static final String PROFILE = "profile";
+    static final String PROFILE_FORMAT = "profileFormat";
 
     @Requirement
     private Logger logger;
@@ -50,6 +53,7 @@ public class ProfilerEventSpy extends AbstractEventSpy {
     private MavenProject topProject;
     private List<String> goals = new ArrayList<String>();
     private Properties properties = new Properties();
+    private enum ReportFormat { HTML, JSON };
 
     public ProfilerEventSpy() {
         this(
@@ -126,14 +130,39 @@ public class ProfilerEventSpy extends AbstractEventSpy {
                 .setParameters(properties);
         setDownloads(context);
 
-        Handlebars handlebars = new Handlebars();
+        ReportFormat format = ReportFormat.HTML;
+        String formatProperty = System.getProperty(PROFILE_FORMAT);
+        if (formatProperty != null && "json".equalsIgnoreCase(formatProperty)) {
+            format = ReportFormat.JSON;
+        }
+
+        String reportString = null;
+        String reportExtension = null;
+
+        switch (format) {
+            case HTML:
+                try {
+                    Template template = new Handlebars().compile("report-template");
+                    reportString = template.apply(context);
+                    reportExtension = "html";
+                } catch (IOException e) {
+                    logger.error("Cannot render profiler report.", e);
+                    return;
+                }
+                break;
+            case JSON:
+                reportString = getJSONRepresentation(context);
+                reportExtension = "json";
+                break;
+        }
+
         FileWriter writer = null;
         try {
-            Template template = handlebars.compile("report-template");
-            writer = new FileWriter(getOuputDestination(new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(now)));
-            writer.write(template.apply(context));
+            String nowString = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(now);
+            writer = new FileWriter(getOuputDestination(nowString, reportExtension));
+            writer.write(reportString);
         } catch (IOException e) {
-            logger.error("Cannot render profiler report.", e);
+            logger.error("Cannot write profiler report.", e);
         } finally {
             if (writer != null) {
                 try {
@@ -168,12 +197,12 @@ public class ProfilerEventSpy extends AbstractEventSpy {
             .setTotalDownloadTime(descriptor.getTotalTimeSpentDownloadingArtifacts());
     }
 
-    private File getOuputDestination(String now) {
+    private File getOuputDestination(String now, String extension) {
         File directory = new File(topProject.getBasedir(), ".profiler");
         if (!directory.exists() && !directory.mkdirs()) {
             throw new RuntimeException("Cannot create file to write profiler report: " + directory);
         }
-        return new File(directory, "profiler-report-" + now + ".html");
+        return new File(directory, "profiler-report-" + now + "." + extension);
     }
 
     private void saveDownloadingTime(RepositoryEvent event) {
@@ -249,5 +278,43 @@ public class ProfilerEventSpy extends AbstractEventSpy {
 
     Properties getProperties() {
         return properties;
+    }
+
+    private String getJSONRepresentation(Data context) {
+        JsonObject obj = new JsonObject();
+        obj.add("name", context.getName());
+        obj.add("goals", context.getGoals());
+        obj.add("date", context.getDate());
+        obj.add("parameters", context.getParameters().toString());
+
+        JsonArray projectsArr = new JsonArray();
+        for (Project project : context.getProjects()) {
+            JsonObject projectObj = new JsonObject();
+            projectObj.add("project", project.getName());
+            projectObj.add("time", project.getTime().toString());
+            JsonArray projectMojosArr = new JsonArray();
+            for (EntryAndTime entry : project.getMojosWithTime()) {
+                JsonObject projectMojoObj = new JsonObject();
+                projectMojoObj.add("mojo", entry.getEntry().toString());
+                projectMojoObj.add("time", entry.getTime().toString());
+                projectMojosArr.add(projectMojoObj);
+            }
+            projectObj.add("mojos", projectMojosArr);
+            projectsArr.add(projectObj);
+        }
+        obj.add("projects", projectsArr);
+
+        if (context.isDownloadSectionDisplayed()) {
+            JsonArray downloadsArr = new JsonArray();
+            for (EntryAndTime download : context.getDownloads()) {
+                JsonObject downloadObj = new JsonObject();
+                downloadObj.add("download", download.getEntry().toString());
+                downloadObj.add("time", download.getTime().toString());
+                downloadsArr.add(downloadObj);
+            }
+            obj.add("downloads", downloadsArr);
+        }
+
+        return obj.toString();
     }
 }
