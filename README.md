@@ -84,3 +84,8 @@ One can choose between `HTML` (by default) or `JSON` report using property `prof
 	}]
 }
 ```
+
+## Build status
+
+[![Build Status](https://travis-ci.org/jcgay/maven-profiler.png)](https://travis-ci.org/jcgay/maven-profiler)
+[![Coverage Status](https://coveralls.io/repos/jcgay/maven-profiler/badge.svg?branch=master)](https://coveralls.io/r/jcgay/maven-profiler?branch=master)
