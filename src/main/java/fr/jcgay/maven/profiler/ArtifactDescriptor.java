@@ -1,4 +1,4 @@
-package com.github.jcgay.maven.profiler;
+package fr.jcgay.maven.profiler;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
@@ -9,7 +9,7 @@ import org.eclipse.aether.artifact.Artifact;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.jcgay.maven.profiler.KnownElapsedTimeTicker.aStopWatchWithElapsedTime;
+import static fr.jcgay.maven.profiler.KnownElapsedTimeTicker.aStopWatchWithElapsedTime;
 import static com.google.common.base.Predicates.notNull;
 import static com.google.common.collect.Iterables.filter;
 

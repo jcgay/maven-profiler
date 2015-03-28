@@ -1,4 +1,4 @@
-package com.github.jcgay.maven.profiler
+package fr.jcgay.maven.profiler
 import com.google.common.base.Stopwatch
 import com.google.common.collect.HashBasedTable
 import org.apache.maven.model.Model
@@ -8,7 +8,7 @@ import org.assertj.core.api.Condition
 import org.codehaus.plexus.util.StringUtils
 import org.testng.annotations.Test
 
-import static com.github.jcgay.maven.profiler.KnownElapsedTimeTicker.aStopWatchWithElapsedTime
+import static fr.jcgay.maven.profiler.KnownElapsedTimeTicker.aStopWatchWithElapsedTime
 import static java.util.concurrent.TimeUnit.*
 import static org.assertj.core.api.Assertions.assertThat
 import static org.assertj.core.api.Assertions.atIndex

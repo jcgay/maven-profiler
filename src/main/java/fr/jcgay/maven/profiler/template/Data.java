@@ -1,4 +1,4 @@
-package com.github.jcgay.maven.profiler.template;
+package fr.jcgay.maven.profiler.template;
 
 import com.google.common.base.Stopwatch;
 import org.eclipse.aether.artifact.Artifact;

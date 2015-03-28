@@ -1,4 +1,4 @@
-package com.github.jcgay.maven.profiler;
+package fr.jcgay.maven.profiler;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;

@@ -1,11 +1,11 @@
-package com.github.jcgay.maven.profiler
+package fr.jcgay.maven.profiler
 import com.google.common.base.Stopwatch
 import com.google.common.base.Strings
 import org.eclipse.aether.artifact.Artifact
 import org.eclipse.aether.artifact.DefaultArtifact
 import org.testng.annotations.Test
 
-import static com.github.jcgay.maven.profiler.KnownElapsedTimeTicker.aStopWatchWithElapsedTime
+import static fr.jcgay.maven.profiler.KnownElapsedTimeTicker.aStopWatchWithElapsedTime
 import static java.util.concurrent.TimeUnit.SECONDS
 import static org.assertj.core.api.Assertions.assertThat
 

@@ -1,10 +1,10 @@
-package com.github.jcgay.maven.profiler
+package fr.jcgay.maven.profiler
 import com.google.common.base.Stopwatch
 import org.apache.maven.model.Model
 import org.apache.maven.project.MavenProject
 import org.testng.annotations.Test
 
-import static com.github.jcgay.maven.profiler.KnownElapsedTimeTicker.aStopWatchWithElapsedTime
+import static fr.jcgay.maven.profiler.KnownElapsedTimeTicker.aStopWatchWithElapsedTime
 import static java.util.concurrent.TimeUnit.*
 import static org.assertj.core.api.Assertions.assertThat
 

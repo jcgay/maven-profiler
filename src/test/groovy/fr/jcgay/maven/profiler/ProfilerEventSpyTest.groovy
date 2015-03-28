@@ -1,4 +1,4 @@
-package com.github.jcgay.maven.profiler
+package fr.jcgay.maven.profiler
 import com.google.common.base.Stopwatch
 import com.google.common.collect.HashBasedTable
 import com.google.common.collect.Table
@@ -22,7 +22,7 @@ import org.testng.annotations.Test
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 
-import static com.github.jcgay.maven.profiler.ProfilerEventSpy.PROFILE
+import static fr.jcgay.maven.profiler.ProfilerEventSpy.PROFILE
 import static java.util.Arrays.asList
 import static java.util.concurrent.TimeUnit.MILLISECONDS
 import static org.apache.maven.execution.ExecutionEvent.Type.*

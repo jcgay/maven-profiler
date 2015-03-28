@@ -1,10 +1,10 @@
-package com.github.jcgay.maven.profiler;
+package fr.jcgay.maven.profiler;
 
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
-import com.github.jcgay.maven.profiler.template.Data;
-import com.github.jcgay.maven.profiler.template.EntryAndTime;
-import com.github.jcgay.maven.profiler.template.Project;
+import fr.jcgay.maven.profiler.template.Data;
+import fr.jcgay.maven.profiler.template.EntryAndTime;
+import fr.jcgay.maven.profiler.template.Project;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.google.common.annotations.VisibleForTesting;
