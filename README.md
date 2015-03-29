@@ -4,9 +4,26 @@ A time execution recorder for Maven which log time taken by each mojo in your bu
 
 ##Installation
 
+### Maven >= 3.3.x
+
+Get [maven-profiler](http://dl.bintray.com/jcgay/maven/com/github/jcgay/maven/maven-profiler/2.2/maven-profiler-2.2-shaded.jar) and copy it in `%M2_HOME%/lib/ext` folder.
+
+*or*
+
+Use the new [core extensions configuration mechanism](http://takari.io/2015/03/19/core-extensions.html) by creating a `${maven.multiModuleProjectDirectory}/.mvn/extensions.xml` file with:
+
+	<?xml version="1.0" encoding="UTF-8"?>
+	<extensions>
+	    <extension>
+	      <groupId>fr.jcgay.maven</groupId>
+	      <artifactId>maven-profiler</artifactId>
+	      <version>2.2</version>
+	    </extension>
+	</extensions>
+
 ### Maven >= 3.1.x
 
-Get [maven-profiler](http://dl.bintray.com/jcgay/maven/com/github/jcgay/maven/maven-profiler/2.1/maven-profiler-2.1.jar) and copy it in `%M2_HOME%/lib/ext` folder.
+Get [maven-profiler](http://dl.bintray.com/jcgay/maven/com/github/jcgay/maven/maven-profiler/2.2/maven-profiler-2.2-shaded.jar) and copy it in `%M2_HOME%/lib/ext` folder.
 
 ### Maven 3.0.x
 (with limited functionality, kept for compatibility)  

@@ -1,3 +1,8 @@
+#2.2
+***
+
+- Compatibility with new Maven [core extensions configuration mechanism](http://takari.io/2015/03/19/core-extensions.html) [view](http://github.com/jcgay/maven-profiler/commit/7cb7d431d39079b58d73731e30123ee25bf116c6)
+
 #2.1
 ***
 
