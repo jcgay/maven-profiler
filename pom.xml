@@ -23,18 +23,6 @@
       <tag>HEAD</tag>
   </scm>
 
-    <distributionManagement>
-        <repository>
-            <id>bintray</id>
-            <name>jcgay-maven-maven-profiler</name>
-            <url>https://api.bintray.com/maven/jcgay/maven/maven-profiler</url>
-        </repository>
-        <snapshotRepository>
-            <id>jcgay-cloudbees-snapshot</id>
-            <url>dav:https://repository-jcgay.forge.cloudbees.com/snapshot/</url>
-        </snapshotRepository>
-    </distributionManagement>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
