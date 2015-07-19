@@ -4,6 +4,25 @@ A time execution recorder for Maven which log time taken by each mojo in your bu
 
 ##Installation
 
+`$M2_HOME` refers to maven installation folder.
+
+```
+.
+├── bin
+├── boot
+├── conf
+└── lib
+``` 
+
+### OS X ?
+
+You can install a pre-packaged maven named [maven-deluxe](https://github.com/jcgay/homebrew-jcgay#maven-deluxe) using `brew`.  
+It comes with [maven-color](https://github.com/jcgay/maven-color), [maven-notifier](https://github.com/jcgay/maven-notifier) and [maven-profiler](https://github.com/jcgay/maven-profiler).  
+It is based on latest maven release.
+
+    brew tap jcgay/jcgay
+    brew install maven-deluxe
+
 ### Maven >= 3.3.x
 
 Get [maven-profiler](http://dl.bintray.com/jcgay/maven/fr/jcgay/maven/maven-profiler/2.2/maven-profiler-2.2-shaded.jar) and copy it in `%M2_HOME%/lib/ext` folder.
