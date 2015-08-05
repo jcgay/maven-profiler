@@ -291,12 +291,12 @@ public class ProfilerEventSpy extends AbstractEventSpy {
         for (Project project : context.getProjects()) {
             JsonObject projectObj = new JsonObject();
             projectObj.add("project", project.getName());
-            projectObj.add("time", project.getTime().toString());
+            projectObj.add("time", project.getMillisTimeStamp());
             JsonArray projectMojosArr = new JsonArray();
             for (EntryAndTime entry : project.getMojosWithTime()) {
                 JsonObject projectMojoObj = new JsonObject();
                 projectMojoObj.add("mojo", entry.getEntry().toString());
-                projectMojoObj.add("time", entry.getTime().toString());
+                projectMojoObj.add("time", entry.getMillisTimeStamp());
                 projectMojosArr.add(projectMojoObj);
             }
             projectObj.add("mojos", projectMojosArr);
@@ -309,7 +309,7 @@ public class ProfilerEventSpy extends AbstractEventSpy {
             for (EntryAndTime download : context.getDownloads()) {
                 JsonObject downloadObj = new JsonObject();
                 downloadObj.add("download", download.getEntry().toString());
-                downloadObj.add("time", download.getTime().toString());
+                downloadObj.add("time", download.getMillisTimeStamp());
                 downloadsArr.add(downloadObj);
             }
             obj.add("downloads", downloadsArr);

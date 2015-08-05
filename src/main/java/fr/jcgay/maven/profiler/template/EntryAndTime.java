@@ -19,4 +19,8 @@ public class EntryAndTime<T> {
     public Stopwatch getTime() {
         return time;
     }
+
+    public String getMillisTimeStamp() {
+        return String.valueOf(time.elapsedMillis()) + " ms";
+    }
 }
