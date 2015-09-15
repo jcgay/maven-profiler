@@ -25,7 +25,7 @@ It is based on latest maven release.
 
 ### Maven >= 3.3.x
 
-Get [maven-profiler](http://dl.bintray.com/jcgay/maven/fr/jcgay/maven/maven-profiler/2.2/maven-profiler-2.2-shaded.jar) and copy it in `%M2_HOME%/lib/ext` folder.
+Get [maven-profiler](http://dl.bintray.com/jcgay/maven/fr/jcgay/maven/maven-profiler/2.3/maven-profiler-2.3-shaded.jar) and copy it in `%M2_HOME%/lib/ext` folder.
 
 *or*
 
@@ -36,13 +36,13 @@ Use the new [core extensions configuration mechanism](http://takari.io/2015/03/1
 	    <extension>
 	      <groupId>fr.jcgay.maven</groupId>
 	      <artifactId>maven-profiler</artifactId>
-	      <version>2.2</version>
+	      <version>2.3</version>
 	    </extension>
 	</extensions>
 
 ### Maven >= 3.1.x
 
-Get [maven-profiler](http://dl.bintray.com/jcgay/maven/fr/jcgay/maven/maven-profiler/2.2/maven-profiler-2.2-shaded.jar) and copy it in `%M2_HOME%/lib/ext` folder.
+Get [maven-profiler](http://dl.bintray.com/jcgay/maven/fr/jcgay/maven/maven-profiler/2.3/maven-profiler-2.3-shaded.jar) and copy it in `%M2_HOME%/lib/ext` folder.
 
 ### Maven 3.0.x
 (with limited functionality, kept for compatibility)  
@@ -79,10 +79,10 @@ One can choose between `HTML` (by default) or `JSON` report using property `prof
 		"time": "6.793 s",
 		"mojos": [{
 			"mojo": "org.apache.maven.plugins:maven-surefire-plugin:2.18:test {execution: default-test}",
-			"time": "2.512 s"
+			"time": "2512 ms"
 		}, {
 			"mojo": "org.apache.maven.plugins:maven-shade-plugin:2.3:shade {execution: default}",
-			"time": "1.458 s"
+			"time": "1458 ms"
 		}, {
 			"mojo": "org.codehaus.gmavenplus:gmavenplus-plugin:1.2:testCompile {execution: default}",
 			"time": "818.3 ms"
@@ -125,3 +125,7 @@ One can choose between `HTML` (by default) or `JSON` report using property `prof
 
 [![Build Status](https://travis-ci.org/jcgay/maven-profiler.png)](https://travis-ci.org/jcgay/maven-profiler)
 [![Coverage Status](https://coveralls.io/repos/jcgay/maven-profiler/badge.svg?branch=master)](https://coveralls.io/r/jcgay/maven-profiler?branch=master)
+
+## Release
+
+    mvn -B release:prepare release:perform
