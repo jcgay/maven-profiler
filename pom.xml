@@ -42,12 +42,12 @@
         <dependency>
             <groupId>com.github.jknack</groupId>
             <artifactId>handlebars</artifactId>
-            <version>2.0.0</version>
+            <version>2.2.3</version>
         </dependency>
         <dependency>
             <groupId>com.eclipsesource.minimal-json</groupId>
             <artifactId>minimal-json</artifactId>
-            <version>0.9.2</version>
+            <version>0.9.4</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
@@ -58,7 +58,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>2.0.5-beta</version>
+            <version>2.0.31-beta</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy</artifactId>
-            <version>2.4.3</version>
+            <version>2.4.4</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
