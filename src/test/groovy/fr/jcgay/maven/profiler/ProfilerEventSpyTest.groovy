@@ -50,6 +50,7 @@ class ProfilerEventSpyTest {
 
         System.setProperty('profile', 'true')
         System.clearProperty('profileFormat')
+        System.setProperty('disableTimeSorting', 'false')
 
         profiler = new ProfilerEventSpy(
                 projects,
