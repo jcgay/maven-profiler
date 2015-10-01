@@ -362,7 +362,15 @@ public class ProfilerEventSpy extends AbstractEventSpy {
         timers.get(currentProject, currentEvent.getMojoExecution()).stop();
 
         if (!isSortingActive) {
-            sequenceEvents.add(new SequenceEvent(currentProject, currentEvent.getMojoExecution()));
+            SequenceEvent event = new SequenceEvent(currentProject, currentEvent.getMojoExecution());
+            if (!sequenceEvents.isEmpty()) {
+                SequenceEvent previousEvent = sequenceEvents.get(sequenceEvents.size() - 1);
+                if (!previousEvent.equals(event)) {
+                    sequenceEvents.add(event);
+                }
+            } else {
+                sequenceEvents.add(event);
+            }
         }
     }
 
