@@ -50,6 +50,7 @@ class ProfilerEventSpyTest {
 
         System.setProperty('profile', 'true')
         System.clearProperty('profileFormat')
+        System.setProperty('disableTimeSorting', 'false')
 
         profiler = new ProfilerEventSpy(
                 projects,
@@ -58,6 +59,13 @@ class ProfilerEventSpyTest {
                 topProject
         )
     }
+
+    @Test
+    void 'should not create the sequence data structures'() throws Exception {
+        assertThat(profiler.getSequenceDownloads()).isNull();
+        assertThat(profiler.getSequenceEvents()).isNull();
+    }
+
 
     @Test
     void 'should start a timer when a mojo start'() throws Exception {
