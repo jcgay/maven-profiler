@@ -61,13 +61,6 @@ class ProfilerEventSpyTest {
     }
 
     @Test
-    void 'should not create the sequence data structures'() throws Exception {
-        assertThat(profiler.getSequenceDownloads()).isNull();
-        assertThat(profiler.getSequenceEvents()).isNull();
-    }
-
-
-    @Test
     void 'should start a timer when a mojo start'() throws Exception {
         ExecutionEvent event = aMojoEvent(MojoStarted, aMavenProject('a-project'))
 

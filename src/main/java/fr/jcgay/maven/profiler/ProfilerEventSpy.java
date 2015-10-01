@@ -75,6 +75,35 @@ public class ProfilerEventSpy extends AbstractEventSpy {
         public void setProject(MavenProject project) {
             this.project = project;
         }
+
+        private static boolean equalString(String str1, String str2) {
+            return str1 != null && str2 != null && str1.equals(str2);
+        }
+
+        public boolean isDuplicated(SequenceEvent event) {
+            boolean isSameProject = false;
+            boolean isSameMojo = false;
+
+
+            MavenProject eventProject = event.getProject();
+            isSameProject = equalString(eventProject.getArtifactId(), project.getArtifactId()) &&
+                equalString(eventProject.getGroupId(), project.getGroupId()) &&
+                equalString(eventProject.getVersion(), project.getVersion()) &&
+                equalString(eventProject.getName(), project.getName()) &&
+                equalString(eventProject.getDefaultGoal(), project.getDefaultGoal()) &&
+                equalString(eventProject.getDescription(), project.getDescription());
+
+            MojoExecution eventMojo = event.getMojo();
+
+            isSameMojo = equalString(eventMojo.getArtifactId(), mojo.getArtifactId()) &&
+                equalString(eventMojo.getVersion(), mojo.getVersion()) &&
+                equalString(eventMojo.getExecutionId(), mojo.getExecutionId()) &&
+                equalString(eventMojo.getGroupId(), mojo.getGroupId()) &&
+                equalString(eventMojo.getGoal(), mojo.getGoal()) &&
+                equalString(eventMojo.getPlugin().toString(), mojo.getPlugin().toString());
+
+            return isSameProject && isSameMojo;
+        }
     }
 
     private List<SequenceEvent> sequenceEvents;
@@ -145,14 +174,6 @@ public class ProfilerEventSpy extends AbstractEventSpy {
     private boolean isActive() {
         String parameter = System.getProperty(PROFILE);
         return parameter != null && !"false".equalsIgnoreCase(parameter);
-    }
-
-    public List<SequenceEvent> getSequenceEvents() {
-        return sequenceEvents;
-    }
-
-    public List<Artifact> getSequenceDownloads() {
-        return sequenceDownloads;
     }
 
     @Override
@@ -254,16 +275,19 @@ public class ProfilerEventSpy extends AbstractEventSpy {
         List<Project> projects = new ArrayList<Project>();
 
         MavenProject currentMavenProject = null;
+        String currentMavenProjectName = null;
         Project currentProject = null;
         for (SequenceEvent sequenceEvent : sequenceEvents) {
-            if (sequenceEvent.getProject() != currentMavenProject) {
+            if (!sequenceEvent.getProject().getName().equals(currentMavenProjectName)) {
                 currentMavenProject = sequenceEvent.getProject();
-                currentProject = new Project(currentMavenProject.getName(), this.projects.get(currentMavenProject));
+                currentMavenProjectName = currentMavenProject.getName();
+                currentProject = new Project(currentMavenProjectName, this.projects.get(currentMavenProject));
                 projects.add(currentProject);
             }
             Stopwatch stopwatch = timers.get(currentMavenProject, sequenceEvent.getMojo());
             currentProject.addMojoTime(new EntryAndTime<MojoExecution>(sequenceEvent.getMojo(), stopwatch));
         }
+
         return projects;
     }
 
@@ -362,15 +386,7 @@ public class ProfilerEventSpy extends AbstractEventSpy {
         timers.get(currentProject, currentEvent.getMojoExecution()).stop();
 
         if (!isSortingActive) {
-            SequenceEvent event = new SequenceEvent(currentProject, currentEvent.getMojoExecution());
-            if (!sequenceEvents.isEmpty()) {
-                SequenceEvent previousEvent = sequenceEvents.get(sequenceEvents.size() - 1);
-                if (!previousEvent.equals(event)) {
-                    sequenceEvents.add(event);
-                }
-            } else {
-                sequenceEvents.add(event);
-            }
+            sequenceEvents.add(new SequenceEvent(currentProject, currentEvent.getMojoExecution()));
         }
     }
 
