@@ -75,35 +75,6 @@ public class ProfilerEventSpy extends AbstractEventSpy {
         public void setProject(MavenProject project) {
             this.project = project;
         }
-
-        private static boolean equalString(String str1, String str2) {
-            return str1 != null && str2 != null && str1.equals(str2);
-        }
-
-        public boolean isDuplicated(SequenceEvent event) {
-            boolean isSameProject = false;
-            boolean isSameMojo = false;
-
-
-            MavenProject eventProject = event.getProject();
-            isSameProject = equalString(eventProject.getArtifactId(), project.getArtifactId()) &&
-                equalString(eventProject.getGroupId(), project.getGroupId()) &&
-                equalString(eventProject.getVersion(), project.getVersion()) &&
-                equalString(eventProject.getName(), project.getName()) &&
-                equalString(eventProject.getDefaultGoal(), project.getDefaultGoal()) &&
-                equalString(eventProject.getDescription(), project.getDescription());
-
-            MojoExecution eventMojo = event.getMojo();
-
-            isSameMojo = equalString(eventMojo.getArtifactId(), mojo.getArtifactId()) &&
-                equalString(eventMojo.getVersion(), mojo.getVersion()) &&
-                equalString(eventMojo.getExecutionId(), mojo.getExecutionId()) &&
-                equalString(eventMojo.getGroupId(), mojo.getGroupId()) &&
-                equalString(eventMojo.getGoal(), mojo.getGoal()) &&
-                equalString(eventMojo.getPlugin().toString(), mojo.getPlugin().toString());
-
-            return isSameProject && isSameMojo;
-        }
     }
 
     private List<SequenceEvent> sequenceEvents;
@@ -208,7 +179,6 @@ public class ProfilerEventSpy extends AbstractEventSpy {
     }
 
     private void writeReport() {
-
         Date now = new Date();
 
         Data context = new Data()
@@ -333,11 +303,13 @@ public class ProfilerEventSpy extends AbstractEventSpy {
 
     private void saveDownloadingTime(RepositoryEvent event) {
         logger.debug(String.format("Received event (%s): %s", event.getClass(), event));
-        if (event.getType() == RepositoryEvent.EventType.ARTIFACT_DOWNLOADING) {
-            startDownload(event);
-        }
-        if (event.getType() == RepositoryEvent.EventType.ARTIFACT_DOWNLOADED) {
-            stopDownload(event);
+        switch (event.getType()) {
+            case ARTIFACT_DOWNLOADING:
+                startDownload(event);
+                break;
+            case ARTIFACT_DOWNLOADED:
+                stopDownload(event);
+                break;
         }
     }
 
@@ -369,13 +341,13 @@ public class ProfilerEventSpy extends AbstractEventSpy {
         MavenProject currentProject = event.getSession().getCurrentProject();
         if (type == ExecutionEvent.Type.ProjectStarted) {
             startProject(currentProject);
-        }
+        } else
         if (type == ExecutionEvent.Type.ProjectSucceeded || type == ExecutionEvent.Type.ProjectFailed) {
             stopProject(currentProject);
-        }
+        } else
         if (type == ExecutionEvent.Type.MojoStarted) {
             startMojo(event, currentProject);
-        }
+        } else
         if (type == ExecutionEvent.Type.MojoSucceeded || type == ExecutionEvent.Type.MojoFailed) {
             stopMojo(event, currentProject);
         }

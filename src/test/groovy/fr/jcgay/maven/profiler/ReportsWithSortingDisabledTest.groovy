@@ -77,6 +77,23 @@ class ReportsWithSortingDisabledTest {
     }
 
     @Test
+    void 'should report artifact downloads in the order in which they were downloaded'() throws Exception {
+        def NUM_ARTIFACTS = 10
+        List<Artifact> artifacts = new ArrayList<>();
+        0.upto(NUM_ARTIFACTS, {
+            def fakeArtifact = anArtifact("test-artifact-${it}")
+            artifacts.add(fakeArtifact)
+            simulateArtifactDownloaded(profiler, fakeArtifact)
+        })
+
+        assertThat(sequenceDownloads.size()).isEqualTo(artifacts.size())
+
+        sequenceDownloads.eachWithIndex{ artifact, artifactIndex ->
+            assertThat(artifact).isEqualTo(artifacts.get(artifactIndex))
+        }
+    }
+
+    @Test
     void 'should report mojos in order of execution'() throws Exception {
         MavenProject project = aMavenProject('test-project')
 
@@ -120,6 +137,37 @@ class ReportsWithSortingDisabledTest {
     }
 
     @Test
+    void 'should ignore the duplicated project instance and report all mojo\'s executions under the same project'()
+        throws Exception {
+        List<MavenProject> projects = new LinkedList<>();
+
+        MavenProject originalMavenProject = aMavenProject("test-project")
+        MavenProject duplicatedMavenProject = aMavenProject("test-project")
+
+        simulateProjectStartedExecution(profiler, originalMavenProject)
+
+        def NUM_MOJO_EVENTS_USING_ORIGINAL_PROJECT = 5
+        0.upto(NUM_MOJO_EVENTS_USING_ORIGINAL_PROJECT, {
+            simulateMojoExecutedSuccessfully(profiler, originalMavenProject, "test-${it}", "testing-mojo-${it}")
+        })
+
+        def NUM_MOJO_EVENTS_USING_DUPLICATED_PROJECT = NUM_MOJO_EVENTS_USING_ORIGINAL_PROJECT + 5
+        (NUM_MOJO_EVENTS_USING_ORIGINAL_PROJECT + 1).upto(NUM_MOJO_EVENTS_USING_DUPLICATED_PROJECT, {
+            simulateMojoExecutedSuccessfully(profiler, duplicatedMavenProject, "test-${it}", "testing-mojo-${it}")
+        })
+
+        simulateProjectEndedExecution(profiler, originalMavenProject);
+
+        profiler.close()
+
+        assertThat(sequenceEvents.size()).isEqualTo(11)
+
+        sequenceEvents.eachWithIndex {event, index ->
+            assertThat(event.project).isEqualTo(originalMavenProject)
+        }
+    }
+
+    @Test
     void 'should report both projects and mojos in order of execution'() throws Exception {
         List<MavenProject> projects = new LinkedList<>();
 
@@ -154,18 +202,12 @@ class ReportsWithSortingDisabledTest {
         }
     }
 
-    @Test
-    private 'should report artifacts by order of download'() throws Exception {
-
+    private static Artifact anArtifact(String artifactId) {
+        anArtifact('groupId', artifactId, 'jar', '1.0.0')
     }
 
-    private static Artifact anArtifact() {
-        ArtifactProfiled.of(new DefaultArtifact('groupId', 'artifactId', 'jar', '1.0'))
-    }
-
-    private void given_artifact_is_being_downloaded(Artifact artifact) throws Exception {
-        profiler.onEvent(aRepositoryEvent(ARTIFACT_DOWNLOADING, artifact).build())
-        MILLISECONDS.sleep(1)
+    private static Artifact anArtifact(String groupId, String artifactId, String type, String version) {
+        ArtifactProfiled.of(new DefaultArtifact(groupId, artifactId, type, version))
     }
 
     private static RepositoryEvent.Builder aRepositoryEvent(RepositoryEvent.EventType type, Artifact artifact) {
@@ -184,6 +226,10 @@ class ReportsWithSortingDisabledTest {
     }
 
     private static void simulateArtifactDownloaded(ProfilerEventSpy profiler, Artifact artifact) {
+        profiler.onEvent(aRepositoryEvent(ARTIFACT_DOWNLOADING, artifact).build())
+        def MAX_RANDOM_DOWNLOAD_TIME = 10
+        MILLISECONDS.sleep(random.nextInt() % MAX_RANDOM_DOWNLOAD_TIME)
+        profiler.onEvent(aRepositoryEvent(ARTIFACT_DOWNLOADED, artifact).build())
     }
 
     private static void simulateProjectStartedExecution(ProfilerEventSpy profiler, MavenProject mavenProject) {
@@ -213,7 +259,9 @@ class ReportsWithSortingDisabledTest {
         ExecutionEvent startEvent = aMojoStartEvent(mojo, mavenProject)
         profiler.onEvent(startEvent)
 
-        MILLISECONDS.sleep(random.nextInt() % 10)
+        def MAX_RANDOM_EXECUTION_TIME = 10
+
+        MILLISECONDS.sleep(random.nextInt() % MAX_RANDOM_EXECUTION_TIME)
 
         ExecutionEvent stopEvent = aMojoStopEvent(mojo, mavenProject)
         profiler.onEvent(stopEvent)
