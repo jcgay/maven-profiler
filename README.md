@@ -12,12 +12,12 @@ A time execution recorder for Maven which log time taken by each mojo in your bu
 ├── boot
 ├── conf
 └── lib
-``` 
+```
 
 ### OS X ?
 
-You can install a pre-packaged maven named [maven-deluxe](https://github.com/jcgay/homebrew-jcgay#maven-deluxe) using `brew`.  
-It comes with [maven-color](https://github.com/jcgay/maven-color), [maven-notifier](https://github.com/jcgay/maven-notifier) and [maven-profiler](https://github.com/jcgay/maven-profiler).  
+You can install a pre-packaged maven named [maven-deluxe](https://github.com/jcgay/homebrew-jcgay#maven-deluxe) using `brew`.
+It comes with [maven-color](https://github.com/jcgay/maven-color), [maven-notifier](https://github.com/jcgay/maven-notifier) and [maven-profiler](https://github.com/jcgay/maven-profiler).
 It is based on latest maven release.
 
     brew tap jcgay/jcgay
@@ -45,7 +45,7 @@ Use the new [core extensions configuration mechanism](http://takari.io/2015/03/1
 Get [maven-profiler](http://dl.bintray.com/jcgay/maven/fr/jcgay/maven/maven-profiler/2.3/maven-profiler-2.3-shaded.jar) and copy it in `%M2_HOME%/lib/ext` folder.
 
 ### Maven 3.0.x
-(with limited functionality, kept for compatibility)  
+(with limited functionality, kept for compatibility)
 Get [maven-profiler](http://dl.bintray.com/jcgay/maven/com/github/jcgay/maven/maven-profiler/1.0/maven-profiler-1.0.jar) and copy it in `%M2_HOME%/lib/ext` folder.
 
 ##Usage
@@ -53,10 +53,16 @@ Get [maven-profiler](http://dl.bintray.com/jcgay/maven/com/github/jcgay/maven/ma
 Use property `profile` when running Maven.
 
 	mvn install -Dprofile
-	
+
 This will generate a report in `.profiler` folder.
 
 One can choose between `HTML` (by default) or `JSON` report using property `profileFormat`.
+
+Also you can add the property `disableTimeSorting` if you want the reported times to be in the order of execution
+instead of sorted by execution time.
+
+    mvn install -Dprofile -DdisableTimeSorting
+
 
 ### HTML
 

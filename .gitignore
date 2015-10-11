@@ -1,6 +1,13 @@
+pom.xml.releaseBackup
+.settings
+bin/
+.project
+.classpath
+mvnvm.properties
 target
 *.iml
 .idea
 .java-version
 .profiler
+release.properties
 .mvn/timing.properties
