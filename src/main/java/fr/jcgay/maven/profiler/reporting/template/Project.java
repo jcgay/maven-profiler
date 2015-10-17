@@ -1,4 +1,4 @@
-package fr.jcgay.maven.profiler.template;
+package fr.jcgay.maven.profiler.reporting.template;
 
 import com.google.common.base.Stopwatch;
 import org.apache.maven.plugin.MojoExecution;
@@ -42,27 +42,4 @@ public class Project {
         return String.format("{%s, %s, totalMojos = %d}", name, getMillisTimeStamp(), mojosWithTime.size());
     }
 
-    public boolean isEqual(Project project) {
-        if (name.equals(project.getName())) {
-            if (time.equals(project.getTime())) {
-                if (mojosWithTime.size() == project.getMojosWithTime().size()) {
-                    int index = 0;
-                    boolean hasSameMojos = true;
-                    for (EntryAndTime<MojoExecution> entryAndTime : mojosWithTime) {
-                        EntryAndTime<MojoExecution> entryAndTime2 = project.getMojosWithTime().get(index);
-
-                        if (!entryAndTime.getEntry().equals(entryAndTime2.getEntry()) ||
-                            !entryAndTime.getTime().equals(entryAndTime2.getTime())) {
-                            hasSameMojos = false;
-                            break;
-                        }
-                        index++;
-                    }
-                    return hasSameMojos;
-                }
-            }
-        }
-
-        return false;
-    }
 }

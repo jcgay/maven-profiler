@@ -3,16 +3,16 @@ package fr.jcgay.maven.profiler;
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Ticker;
 
-class KnownElapsedTimeTicker extends Ticker {
+public class KnownElapsedTimeTicker extends Ticker {
 
     private final long expectedElapsedTime;
     private boolean firstRead;
 
-    KnownElapsedTimeTicker(long expectedElapsedTime) {
+    public KnownElapsedTimeTicker(long expectedElapsedTime) {
         this.expectedElapsedTime = expectedElapsedTime;
     }
 
-    static Stopwatch aStopWatchWithElapsedTime(long elapsedTime) {
+    public static Stopwatch aStopWatchWithElapsedTime(long elapsedTime) {
         return new Stopwatch(new KnownElapsedTimeTicker(elapsedTime)).start().stop();
     }
 

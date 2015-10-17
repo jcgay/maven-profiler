@@ -1,4 +1,4 @@
-package fr.jcgay.maven.profiler.template;
+package fr.jcgay.maven.profiler.reporting.template;
 
 import com.google.common.base.Stopwatch;
 

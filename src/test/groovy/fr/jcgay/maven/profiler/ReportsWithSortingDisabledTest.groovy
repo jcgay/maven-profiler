@@ -1,79 +1,40 @@
 package fr.jcgay.maven.profiler
-import com.google.common.base.Stopwatch
-import com.google.common.collect.HashBasedTable
-import com.google.common.collect.Table
-import org.apache.maven.execution.DefaultMavenExecutionRequest
+import fr.jcgay.maven.profiler.reporting.Reporter
+import fr.jcgay.maven.profiler.sorting.execution.ByExecutionOrder
 import org.apache.maven.execution.ExecutionEvent
 import org.apache.maven.model.Model
 import org.apache.maven.model.Plugin
 import org.apache.maven.plugin.MojoExecution
 import org.apache.maven.project.MavenProject
-import org.assertj.guava.api.Assertions
 import org.eclipse.aether.DefaultRepositorySystemSession
 import org.eclipse.aether.RepositoryEvent
 import org.eclipse.aether.artifact.Artifact
 import org.eclipse.aether.artifact.DefaultArtifact
-import org.eclipse.aether.repository.RemoteRepository
-import org.eclipse.aether.transfer.ArtifactNotFoundException
-import org.testng.Reporter
-import org.testng.ReporterConfig
-import org.testng.annotations.BeforeClass
 import org.testng.annotations.BeforeMethod
-import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
 
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentMap
-
-import static fr.jcgay.maven.profiler.ProfilerEventSpy.PROFILE
-import static java.util.Arrays.asList
+import static fr.jcgay.maven.profiler.MavenStubs.aMavenTopProject
 import static java.util.concurrent.TimeUnit.MILLISECONDS
-import static org.apache.maven.execution.ExecutionEvent.Type.*
 import static org.assertj.core.api.Assertions.assertThat
 import static org.eclipse.aether.RepositoryEvent.EventType.ARTIFACT_DOWNLOADED
 import static org.eclipse.aether.RepositoryEvent.EventType.ARTIFACT_DOWNLOADING
+import static org.mockito.Mockito.mock
 
 class ReportsWithSortingDisabledTest {
 
-    private static Random random
+    private static Random random = new Random()
 
     private ProfilerEventSpy profiler
-    private Table<MavenProject, MojoExecution, Stopwatch> timers
-    private ConcurrentMap<Artifact, Stopwatch> downloadTimers
-    private ConcurrentHashMap<MavenProject, Stopwatch> projects
-    private MavenProject topProject
-    private List<ProfilerEventSpy.SequenceEvent> sequenceEvents
-    private List<Artifact> sequenceDownloads
-
-    static {
-        random = new Random()
-    }
+    private Statistics statistics
 
     @BeforeMethod
     void setUp() throws Exception {
-        timers = HashBasedTable.create()
-        downloadTimers = new ConcurrentHashMap<Artifact, Stopwatch>()
+        def reporter = mock(Reporter)
+        
+        statistics = new Statistics()
+            .setTopProject(aMavenTopProject('top-project'))
 
-        projects = new ConcurrentHashMap<MavenProject, Stopwatch>()
-
-        topProject = aMavenProject('top-project')
-        topProject.file = File.createTempFile('pom', '.xml')
-
-        System.setProperty('profile', 'true')
-        System.clearProperty('profileFormat')
-        System.setProperty('disableTimeSorting', 'true')
-
-        sequenceEvents = new LinkedList<>()
-        sequenceDownloads = new LinkedList<>()
-
-        profiler = new ProfilerEventSpy(
-                projects,
-                timers,
-                downloadTimers,
-                topProject,
-                sequenceEvents,
-                sequenceDownloads
-        )
+        profiler = new ProfilerEventSpy(statistics, new Configuration(true, reporter, new ByExecutionOrder()))
     }
 
     @Test
@@ -86,9 +47,9 @@ class ReportsWithSortingDisabledTest {
             simulateArtifactDownloaded(profiler, fakeArtifact)
         })
 
-        assertThat(sequenceDownloads.size()).isEqualTo(artifacts.size())
-
-        sequenceDownloads.eachWithIndex{ artifact, artifactIndex ->
+        def result = statistics.downloads()
+        assertThat(result).hasSameSizeAs(artifacts)
+        result.eachWithIndex{ artifact, timer, artifactIndex ->
             assertThat(artifact).isEqualTo(artifacts.get(artifactIndex))
         }
     }
@@ -111,9 +72,10 @@ class ReportsWithSortingDisabledTest {
         simulateProjectEndedExecution(profiler, project)
         profiler.close()
 
-        sequenceEvents.eachWithIndex {event, index ->
-            assertThat(event.mojo.goal).isEqualTo(mojos[index].get(0))
-            assertThat(event.mojo.executionId).isEqualTo(mojos[index].get(1))
+        def result = statistics.executions().row(project)
+        result.eachWithIndex {execution, timer, index ->
+            assertThat(execution.goal).isEqualTo(mojos[index].get(0))
+            assertThat(execution.executionId).isEqualTo(mojos[index].get(1))
         }
     }
 
@@ -131,15 +93,15 @@ class ReportsWithSortingDisabledTest {
 
         profiler.close()
 
-        sequenceEvents.eachWithIndex {event, index ->
-            assertThat(event.project.model.name).isEqualTo(projects[index].model.name)
+        def result = statistics.executions().rowMap()
+        result.eachWithIndex {project, executions, index ->
+            assertThat(project.model.name).isEqualTo(projects[index].model.name)
         }
     }
 
     @Test
-    void 'should ignore the duplicated project instance and report all mojo\'s executions under the same project'()
+    void "should ignore the duplicated project instance and report all mojo's executions under the same project"()
         throws Exception {
-        List<MavenProject> projects = new LinkedList<>();
 
         MavenProject originalMavenProject = aMavenProject("test-project")
         MavenProject duplicatedMavenProject = aMavenProject("test-project")
@@ -160,10 +122,10 @@ class ReportsWithSortingDisabledTest {
 
         profiler.close()
 
-        assertThat(sequenceEvents.size()).isEqualTo(11)
-
-        sequenceEvents.eachWithIndex {event, index ->
-            assertThat(event.project).isEqualTo(originalMavenProject)
+        def result = statistics.executions()
+        assertThat(result.columnKeySet()).hasSize(11)
+        result.rowKeySet().eachWithIndex {project, index ->
+            assertThat(project).isEqualTo(originalMavenProject)
         }
     }
 
@@ -187,17 +149,11 @@ class ReportsWithSortingDisabledTest {
 
         profiler.close()
 
-        def eventIndex = 0
-        for (def projectIndex = 0; projectIndex < NUM_PROJECTS; projectIndex++) {
-            def event = sequenceEvents.get(eventIndex)
-            eventIndex++
-            assertThat(event.project.model.name).isEqualTo(projects.get(projectIndex).model.name)
+        statistics.executions().rowMap().eachWithIndex { project, executions, projectIndex ->
+            assertThat(project.model.name).isEqualTo(projects.get(projectIndex).model.name)
 
-            for (def mojoIndex = 0; mojoIndex < NUM_MOJOS; mojoIndex++) {
-                assertThat(event.mojo.executionId).isEqualTo('testing-mojo-' + mojoIndex.toString())
-
-                event = sequenceEvents.get(eventIndex)
-                eventIndex++
+            executions.eachWithIndex { execution, timer, executionIndex ->
+                assertThat(execution.executionId).isEqualTo('testing-mojo-' + executionIndex)
             }
         }
     }
@@ -220,7 +176,7 @@ class ReportsWithSortingDisabledTest {
         model.name = name
         MavenProject project = new MavenProject(model)
         project.groupId = 'groupId'
-        project.artifactId = 'artifactId'
+        project.artifactId = name
         project.version = '1.0'
         project
     }
@@ -265,10 +221,6 @@ class ReportsWithSortingDisabledTest {
 
         ExecutionEvent stopEvent = aMojoStopEvent(mojo, mavenProject)
         profiler.onEvent(stopEvent)
-    }
-
-    private static ExecutionEvent aMojoStartedEvent(ExecutionEvent.Type type, MavenProject mavenProject) {
-        aMojoEvent(type, new MojoExecution(new Plugin(), 'goal', 'execution.id'), mavenProject)
     }
 
     private static ExecutionEvent aMojoStartEvent(MojoExecution mojoExecution, MavenProject mavenProject) {

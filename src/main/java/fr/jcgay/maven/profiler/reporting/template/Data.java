@@ -1,10 +1,15 @@
-package fr.jcgay.maven.profiler.template;
+package fr.jcgay.maven.profiler.reporting.template;
 
 import com.google.common.base.Stopwatch;
 import org.eclipse.aether.artifact.Artifact;
 
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+
+import static com.google.common.base.Objects.firstNonNull;
 
 public class Data {
 
@@ -12,17 +17,17 @@ public class Data {
     private List<EntryAndTime<Artifact>> downloads;
     private Stopwatch totalDownloadTime;
     private Stopwatch buildTime;
-    private String date;
+    private Date date;
     private String name;
     private String goals;
     private Properties parameters;
 
     public List<Project> getProjects() {
-        return projects;
+        return firstNonNull(projects, Collections.<Project>emptyList());
     }
 
     public List<EntryAndTime<Artifact>> getDownloads() {
-        return downloads;
+        return firstNonNull(downloads, Collections.<EntryAndTime<Artifact>>emptyList());
     }
 
     public Stopwatch getTotalDownloadTime() {
@@ -37,8 +42,12 @@ public class Data {
         return buildTime;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
+    }
+
+    public String getFormattedDate() {
+        return new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date);
     }
 
     public String getName() {
@@ -50,7 +59,7 @@ public class Data {
     }
 
     public Properties getParameters() {
-        return parameters;
+        return parameters == null ? new Properties() : parameters;
     }
 
     public Data setProjects(List<Project> projects) {
@@ -73,7 +82,7 @@ public class Data {
         return this;
     }
 
-    public Data setDate(String date) {
+    public Data setDate(Date date) {
         this.date = date;
         return this;
     }

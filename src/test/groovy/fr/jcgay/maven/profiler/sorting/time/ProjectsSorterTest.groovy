@@ -1,4 +1,4 @@
-package fr.jcgay.maven.profiler
+package fr.jcgay.maven.profiler.sorting.time
 import com.google.common.base.Stopwatch
 import org.apache.maven.model.Model
 import org.apache.maven.project.MavenProject
