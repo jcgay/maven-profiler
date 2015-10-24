@@ -1,3 +1,8 @@
+#2.4
+***
+
+- Can get times sorted by execution order ([03f28d7](http://github.com/jcgay/maven-profiler/commit/03f28d70195767f90495370d4dc94d20a141f782)) by [@higuaro](https://github.com/higuaro)
+
 #2.3
 ***
 
