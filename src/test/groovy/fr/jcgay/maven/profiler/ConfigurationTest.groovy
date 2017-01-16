@@ -39,7 +39,7 @@ class ConfigurationTest {
 
         def result = Configuration.read()
 
-        assertThat(result.reporter()).isExactlyInstanceOf(HtmlReporter)
+        assertThat(result.reporter().delegates).extracting("class").containsExactly(HtmlReporter)
     }
 
     @DataProvider
@@ -53,9 +53,23 @@ class ConfigurationTest {
 
         def result = Configuration.read()
 
-        assertThat(result.reporter()).isExactlyInstanceOf(JsonReporter)
+        assertThat(result.reporter().delegates).extracting("class").containsExactly(JsonReporter)
     }
 
+    @DataProvider
+    Object[][] 'two formats'() {
+        [['json,html'], ['JSON,HTML'], ['jSoN,HtMl']]
+    }    
+    
+    @Test(dataProvider = 'two formats')
+    void 'two report formats'(String format) {
+        System.setProperty('profileFormat', format)
+
+        def result = Configuration.read()
+
+        assertThat(result.reporter().delegates).extracting("class").containsExactly(JsonReporter,HtmlReporter)
+    }
+    
     @Test
     void 'do not sort result, keep execution order'() {
         System.setProperty('disableTimeSorting', 'true')
@@ -70,7 +84,7 @@ class ConfigurationTest {
         def result = Configuration.read()
 
         assertThat(result.isProfiling()).isFalse()
-        assertThat(result.reporter()).isExactlyInstanceOf(HtmlReporter)
+        assertThat(result.reporter().delegates).extracting("class").containsExactly(HtmlReporter)
         assertThat(result.sorter()).isExactlyInstanceOf(ByExecutionTime)
     }
 }
