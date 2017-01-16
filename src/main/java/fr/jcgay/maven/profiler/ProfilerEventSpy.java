@@ -1,13 +1,14 @@
 package fr.jcgay.maven.profiler;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Joiner;
-import com.google.common.base.Stopwatch;
-import fr.jcgay.maven.profiler.reporting.ReportDirectory;
-import fr.jcgay.maven.profiler.reporting.template.Data;
-import fr.jcgay.maven.profiler.reporting.template.EntryAndTime;
-import fr.jcgay.maven.profiler.reporting.template.Project;
-import fr.jcgay.maven.profiler.sorting.Sorter;
+import static org.apache.maven.execution.ExecutionEvent.Type.SessionStarted;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.maven.eventspy.AbstractEventSpy;
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -21,14 +22,15 @@ import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.artifact.Artifact;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Joiner;
+import com.google.common.base.Stopwatch;
 
-import static org.apache.maven.execution.ExecutionEvent.Type.SessionStarted;
+import fr.jcgay.maven.profiler.reporting.ReportDirectory;
+import fr.jcgay.maven.profiler.reporting.template.Data;
+import fr.jcgay.maven.profiler.reporting.template.EntryAndTime;
+import fr.jcgay.maven.profiler.reporting.template.Project;
+import fr.jcgay.maven.profiler.sorting.Sorter;
 
 @Component(role = EventSpy.class, hint = "profiler", description = "Measure times taken by Maven.")
 public class ProfilerEventSpy extends AbstractEventSpy {
@@ -84,9 +86,9 @@ public class ProfilerEventSpy extends AbstractEventSpy {
         }
     }
 
-    private void trySaveTopProject(ExecutionEvent event) {
+    private void trySaveTopProject(ExecutionEvent event) {    	
         if (event.getType() == SessionStarted) {
-            statistics.setTopProject(event.getProject());
+            statistics.setTopProject(event.getSession().getTopLevelProject());
         }
     }
 
