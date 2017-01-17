@@ -3,10 +3,13 @@ language: java
 jdk:
   - oraclejdk8
   - oraclejdk7
-  - openjdk6
+install:
+  - ./mvnw install -Dinvoker.skip=true -DskipTests=true -B -V
+script:
+  - ./mvnw verify -B
 after_success:
-  - "[[ ${TRAVIS_PULL_REQUEST} == 'false' ]] && [[ ${TRAVIS_TAG} == '' ]] && mvn deploy -DskipTests --settings etc/deploy-settings.xml"
-  - mvn verify coveralls:report -Prun-coverage
+  - "[[ ${TRAVIS_PULL_REQUEST} == 'false' ]] && [[ ${TRAVIS_TAG} == '' ]] && ./mvnw deploy -Dinvoker.skip=true -DskipTests --settings etc/deploy-settings.xml"
+  - ./mvnw verify coveralls:report -Dinvoker.skip=true -Prun-coverage
 env:
   global:
     - secure: cttGV5bt0VuZZXHK0yo9rfszAjX67+pcRKMBjGuFEdr3v8uD55ho2qrXAtKEbG5x/g1atBXKD3HhBzK5Mb00XDkF93TQdX9veO6619xcVqQ7LdzPDIbbpX7lrS7vIaUaM77+hCtHFEKZs6+DVyeL93z0Vy7GiIAnRAnGomlmAwc=

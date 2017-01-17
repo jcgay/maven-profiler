@@ -8,16 +8,24 @@ import fr.jcgay.maven.profiler.reporting.Reporter;
 import fr.jcgay.maven.profiler.reporting.template.Data;
 import fr.jcgay.maven.profiler.reporting.template.EntryAndTime;
 import fr.jcgay.maven.profiler.reporting.template.Project;
+import org.slf4j.Logger;
+
+import java.io.File;
 
 import static fr.jcgay.maven.profiler.reporting.ReportFormat.JSON;
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class JsonReporter implements Reporter {
+
+    private static final Logger LOGGER = getLogger(JsonReporter.class);
 
     @Override
     public void write(Data data, ReportDirectory directory) {
         String reportString = getJSONRepresentation(data);
 
-        Files.write(directory.fileName(data.getDate(), JSON), reportString);
+        File file = directory.fileName(data.getDate(), JSON);
+        Files.write(file, reportString);
+        LOGGER.info("JSON profiling report has been saved in: {}", file);
     }
 
     private String getJSONRepresentation(Data context) {

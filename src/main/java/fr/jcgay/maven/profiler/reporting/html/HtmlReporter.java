@@ -7,6 +7,7 @@ import fr.jcgay.maven.profiler.reporting.Reporter;
 import fr.jcgay.maven.profiler.reporting.template.Data;
 import org.slf4j.Logger;
 
+import java.io.File;
 import java.io.IOException;
 
 import static fr.jcgay.maven.profiler.reporting.ReportFormat.HTML;
@@ -29,6 +30,8 @@ public class HtmlReporter implements Reporter {
             return;
         }
 
-        Files.write(directory.fileName(data.getDate(), HTML), report);
+        File file = directory.fileName(data.getDate(), HTML);
+        Files.write(file, report);
+        LOGGER.info("HTML profiling report has been saved in: {}", file);
     }
 }
