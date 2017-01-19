@@ -1,15 +1,16 @@
 sudo: false
 language: java
-jdk:
-  - oraclejdk8
-  - oraclejdk7
+before_install:
+  - jdk_switcher use openjdk6
+  - sed -i "s|\[JDK6\]|$JAVA_HOME|g" etc/toolchains.xml
+  - jdk_switcher use oraclejdk8
 install:
-  - ./mvnw install -Dinvoker.skip=true -DskipTests=true -B -V
+  - ./mvnw install -Dinvoker.skip=true -DskipTests=true -B -V -t etc/toolchains.xml
 script:
-  - ./mvnw verify -B
+  - ./mvnw verify -B -t etc/toolchains.xml
 after_success:
-  - "[[ ${TRAVIS_PULL_REQUEST} == 'false' ]] && [[ ${TRAVIS_TAG} == '' ]] && ./mvnw deploy -Dinvoker.skip=true -DskipTests --settings etc/deploy-settings.xml"
-  - ./mvnw verify coveralls:report -Dinvoker.skip=true -Prun-coverage
+  - "[[ ${TRAVIS_PULL_REQUEST} == 'false' ]] && [[ ${TRAVIS_TAG} == '' ]] && ./mvnw deploy -Dinvoker.skip=true -DskipTests --settings etc/deploy-settings.xml -t etc/toolchains.xml"
+  - ./mvnw verify coveralls:report -Dinvoker.skip=true -Prun-coverage -t etc/toolchains.xml
 env:
   global:
     - secure: cttGV5bt0VuZZXHK0yo9rfszAjX67+pcRKMBjGuFEdr3v8uD55ho2qrXAtKEbG5x/g1atBXKD3HhBzK5Mb00XDkF93TQdX9veO6619xcVqQ7LdzPDIbbpX7lrS7vIaUaM77+hCtHFEKZs6+DVyeL93z0Vy7GiIAnRAnGomlmAwc=
