@@ -25,7 +25,7 @@ It is based on latest maven release.
 
 ### Maven >= 3.3.x
 
-Get [maven-profiler](http://dl.bintray.com/jcgay/maven/fr/jcgay/maven/maven-profiler/2.4/maven-profiler-2.4-shaded.jar) and copy it in `%M2_HOME%/lib/ext` folder.
+Get [maven-profiler](http://dl.bintray.com/jcgay/maven/fr/jcgay/maven/maven-profiler/2.5/maven-profiler-2.5-shaded.jar) and copy it in `%M2_HOME%/lib/ext` folder.
 
 *or*
 
@@ -36,13 +36,13 @@ Use the new [core extensions configuration mechanism](http://takari.io/2015/03/1
 	    <extension>
 	      <groupId>fr.jcgay.maven</groupId>
 	      <artifactId>maven-profiler</artifactId>
-	      <version>2.4</version>
+	      <version>2.5</version>
 	    </extension>
 	</extensions>
 
 ### Maven >= 3.1.x
 
-Get [maven-profiler](http://dl.bintray.com/jcgay/maven/fr/jcgay/maven/maven-profiler/2.4/maven-profiler-2.4-shaded.jar) and copy it in `%M2_HOME%/lib/ext` folder.
+Get [maven-profiler](http://dl.bintray.com/jcgay/maven/fr/jcgay/maven/maven-profiler/2.5/maven-profiler-2.5-shaded.jar) and copy it in `%M2_HOME%/lib/ext` folder.
 
 ### Maven 3.0.x
 (with limited functionality, kept for compatibility)
@@ -56,13 +56,15 @@ Use property `profile` when running Maven.
 
 This will generate a report in `.profiler` folder.
 
-One can choose between `HTML` (by default) or `JSON` report using property `profileFormat`.
+One can choose between `HTML` (by default) or `JSON` report using property `profileFormat`. Or you can compose multiple reporters separated by comma:
 
-Also you can add the property `disableTimeSorting` if you want the reported times to be in the order of execution
-instead of sorted by execution time.
+    mvn install -Dprofile -DprofileFormat=JSON,HTML
+
+Also you can add the property `disableTimeSorting` if you want the reported times to be in the order of execution instead of sorted by execution time.
 
     mvn install -Dprofile -DdisableTimeSorting
 
+This will also works when `mvn` is executed on multiple threads (option `-T`).
 
 ### HTML
 
@@ -76,54 +78,83 @@ instead of sorted by execution time.
 
 ```
 {
-	"name": "maven-profiler",
-	"goals": "clean install",
-	"date": "2015/01/17 15:28:49",
-	"parameters": "{profile=true, profileFormat=JSON}",
-	"projects": [{
-		"project": "maven-profiler",
-		"time": "6.793 s",
-		"mojos": [{
-			"mojo": "org.apache.maven.plugins:maven-surefire-plugin:2.18:test {execution: default-test}",
-			"time": "2512 ms"
-		}, {
-			"mojo": "org.apache.maven.plugins:maven-shade-plugin:2.3:shade {execution: default}",
-			"time": "1458 ms"
-		}, {
-			"mojo": "org.codehaus.gmavenplus:gmavenplus-plugin:1.2:testCompile {execution: default}",
-			"time": "818.3 ms"
-		}, {
-			"mojo": "org.apache.maven.plugins:maven-compiler-plugin:3.2:compile {execution: default-compile}",
-			"time": "538.7 ms"
-		}, {
-			"mojo": "org.apache.maven.plugins:maven-source-plugin:2.4:jar-no-fork {execution: attach-sources}",
-			"time": "248.5 ms"
-		}, {
-			"mojo": "org.apache.maven.plugins:maven-jar-plugin:2.5:jar {execution: default-jar}",
-			"time": "238.2 ms"
-		}, {
-			"mojo": "org.apache.maven.plugins:maven-resources-plugin:2.7:resources {execution: default-resources}",
-			"time": "171.7 ms"
-		}, {
-			"mojo": "org.codehaus.plexus:plexus-component-metadata:1.6:generate-metadata {execution: default}",
-			"time": "170.5 ms"
-		}, {
-			"mojo": "org.apache.maven.plugins:maven-enforcer-plugin:1.2:enforce {execution: enforce-maven}",
-			"time": "126.0 ms"
-		}, {
-			"mojo": "org.apache.maven.plugins:maven-clean-plugin:2.6.1:clean {execution: default-clean}",
-			"time": "76.11 ms"
-		}, {
-			"mojo": "org.apache.maven.plugins:maven-install-plugin:2.5.2:install {execution: default-install}",
-			"time": "53.95 ms"
-		}, {
-			"mojo": "org.apache.maven.plugins:maven-compiler-plugin:3.2:testCompile {execution: default-testCompile}",
-			"time": "2.850 ms"
-		}, {
-			"mojo": "org.apache.maven.plugins:maven-resources-plugin:2.7:testResources {execution: default-testResources}",
-			"time": "2.518 ms"
-		}]
-	}]
+  "name": "maven-profiler",
+  "time": "44681 ms",
+  "goals": "clean install",
+  "date": "2017/01/21 19:10:04",
+  "parameters": "{profile=true, profileFormat=JSON}",
+  "projects": [
+    {
+      "project": "maven-profiler",
+      "time": "43378 ms",
+      "mojos": [
+        {
+          "mojo": "org.apache.maven.plugins:maven-invoker-plugin:2.0.0:run {execution: integration-test}",
+          "time": "30706 ms"
+        },
+        {
+          "mojo": "org.apache.maven.plugins:maven-surefire-plugin:2.19.1:test {execution: default-test}",
+          "time": "7300 ms"
+        },
+        {
+          "mojo": "org.apache.maven.plugins:maven-shade-plugin:2.4.3:shade {execution: default}",
+          "time": "1378 ms"
+        },
+        {
+          "mojo": "org.apache.maven.plugins:maven-compiler-plugin:3.6.0:compile {execution: default-compile}",
+          "time": "1112 ms"
+        },
+        {
+          "mojo": "org.codehaus.gmavenplus:gmavenplus-plugin:1.5:testCompile {execution: default}",
+          "time": "1102 ms"
+        },
+        {
+          "mojo": "org.apache.maven.plugins:maven-invoker-plugin:2.0.0:install {execution: integration-test}",
+          "time": "293 ms"
+        },
+        {
+          "mojo": "org.apache.maven.plugins:maven-enforcer-plugin:1.4.1:enforce {execution: enforce-maven}",
+          "time": "225 ms"
+        },
+        {
+          "mojo": "org.apache.maven.plugins:maven-clean-plugin:3.0.0:clean {execution: default-clean}",
+          "time": "221 ms"
+        },
+        {
+          "mojo": "org.codehaus.plexus:plexus-component-metadata:1.7.1:generate-metadata {execution: default}",
+          "time": "195 ms"
+        },
+        {
+          "mojo": "org.apache.maven.plugins:maven-jar-plugin:3.0.2:jar {execution: default-jar}",
+          "time": "167 ms"
+        },
+        {
+          "mojo": "org.apache.maven.plugins:maven-source-plugin:3.0.1:jar-no-fork {execution: attach-sources}",
+          "time": "138 ms"
+        },
+        {
+          "mojo": "org.apache.maven.plugins:maven-resources-plugin:3.0.2:resources {execution: default-resources}",
+          "time": "106 ms"
+        },
+        {
+          "mojo": "org.apache.maven.plugins:maven-toolchains-plugin:1.1:toolchain {execution: default}",
+          "time": "72 ms"
+        },
+        {
+          "mojo": "org.apache.maven.plugins:maven-install-plugin:2.5.2:install {execution: default-install}",
+          "time": "46 ms"
+        },
+        {
+          "mojo": "org.apache.maven.plugins:maven-resources-plugin:3.0.2:testResources {execution: default-testResources}",
+          "time": "2 ms"
+        },
+        {
+          "mojo": "org.apache.maven.plugins:maven-compiler-plugin:3.6.0:testCompile {execution: default-testCompile}",
+          "time": "2 ms"
+        }
+      ]
+    }
+  ]
 }
 ```
 

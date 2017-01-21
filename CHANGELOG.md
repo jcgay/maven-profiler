@@ -1,3 +1,11 @@
+#2.5
+***
+
+- Report global build time ([83fc997](http://github.com/jcgay/maven-profiler/commit/83fc9974f0dfb0d464ad6f662304d6959f72561e))
+- Log when profiler is active and report directory ([5e21c3a](http://github.com/jcgay/maven-profiler/commit/5e21c3a529b928b4f98f0029fb65d8a12c5a45ad))
+- Use event.getSession().getTopLevelProject() ([fbc8c7c](http://github.com/jcgay/maven-profiler/commit/fbc8c7ce18b108ecc81ce9b6395c0f0a2df85d84)) by [@jakub-bochenski](https://github.com/jakub-bochenski)
+- profileFormat can now take multiple, comma-separated formats ([d2ccdb9](http://github.com/jcgay/maven-profiler/commit/d2ccdb9d7897b7735a0b57ed7a21ab54e4fc26cd)) by [@jakub-bochenski](https://github.com/jakub-bochenski)
+
 #2.4
 ***
 
