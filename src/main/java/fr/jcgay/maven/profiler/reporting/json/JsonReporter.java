@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 
 import java.io.File;
 
+import static fr.jcgay.maven.profiler.reporting.Format.ms;
 import static fr.jcgay.maven.profiler.reporting.ReportFormat.JSON;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -31,6 +32,7 @@ public class JsonReporter implements Reporter {
     private String getJSONRepresentation(Data context) {
         JsonObject obj = new JsonObject();
         obj.add("name", context.getName());
+        obj.add("time", ms(context.getBuildTime()));
         obj.add("goals", context.getGoals());
         obj.add("date", context.getFormattedDate());
         obj.add("parameters", context.getParameters().toString());
@@ -39,12 +41,12 @@ public class JsonReporter implements Reporter {
         for (Project project : context.getProjects()) {
             JsonObject projectObj = new JsonObject();
             projectObj.add("project", project.getName());
-            projectObj.add("time", project.getMillisTimeStamp());
+            projectObj.add("time", ms(project.getTime()));
             JsonArray projectMojosArr = new JsonArray();
             for (EntryAndTime entry : project.getMojosWithTime()) {
                 JsonObject projectMojoObj = new JsonObject();
                 projectMojoObj.add("mojo", entry.getEntry().toString());
-                projectMojoObj.add("time", entry.getMillisTimeStamp());
+                projectMojoObj.add("time", ms(entry.getTime()));
                 projectMojosArr.add(projectMojoObj);
             }
             projectObj.add("mojos", projectMojosArr);
@@ -57,7 +59,7 @@ public class JsonReporter implements Reporter {
             for (EntryAndTime download : context.getDownloads()) {
                 JsonObject downloadObj = new JsonObject();
                 downloadObj.add("download", download.getEntry().toString());
-                downloadObj.add("time", download.getMillisTimeStamp());
+                downloadObj.add("time", ms(download.getTime()));
                 downloadsArr.add(downloadObj);
             }
             obj.add("downloads", downloadsArr);

@@ -30,11 +30,11 @@ class ReportsWithSortingDisabledTest {
     @BeforeMethod
     void setUp() throws Exception {
         def reporter = mock(Reporter)
-        
+
         statistics = new Statistics()
             .setTopProject(aMavenTopProject('top-project'))
 
-        profiler = new ProfilerEventSpy(statistics, new Configuration(true, reporter, new ByExecutionOrder()))
+        profiler = new ProfilerEventSpy(statistics, new Configuration(true, reporter, new ByExecutionOrder()), { new Date() })
     }
 
     @Test

@@ -1,4 +1,5 @@
 package fr.jcgay.maven.profiler
+
 import com.google.common.base.Stopwatch
 import fr.jcgay.maven.profiler.reporting.ReportDirectory
 import fr.jcgay.maven.profiler.reporting.Reporter
@@ -17,6 +18,7 @@ import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
 
 import static fr.jcgay.maven.profiler.MavenStubs.*
+import static java.util.Calendar.JANUARY
 import static java.util.concurrent.TimeUnit.MILLISECONDS
 import static org.apache.maven.execution.ExecutionEvent.Type.*
 import static org.assertj.core.api.Assertions.assertThat
@@ -30,9 +32,9 @@ class ProfilerEventSpyTest {
 
     private ProfilerEventSpy profiler
     private Statistics statistics
-
     private Reporter reporter
     private Sorter sorter
+    private Date finishTime = date(2017, JANUARY, 22)
 
     @BeforeMethod
     void setUp() throws Exception {
@@ -44,7 +46,7 @@ class ProfilerEventSpyTest {
         statistics = new Statistics()
             .setTopProject(topProject)
 
-        profiler = new ProfilerEventSpy(statistics, new Configuration(true, reporter, sorter))
+        profiler = new ProfilerEventSpy(statistics, new Configuration(true, reporter, sorter), { finishTime })
     }
 
     @Test
@@ -167,6 +169,28 @@ class ProfilerEventSpyTest {
         def result = data.value
         assertThat(result.goals).isEqualTo('clean install')
         assertThat(result.parameters).isEqualTo(event.getUserProperties())
+    }
+
+    @Test
+    void 'should report total execution time'() throws Exception {
+        ExecutionEvent event = new TestExecutionEvent(ProjectDiscoveryStarted, null, null)
+        event.session.request.startTime = date(2017, JANUARY, 21)
+
+        profiler.onEvent(event)
+        profiler.close()
+
+        def data = ArgumentCaptor.forClass(Data)
+        verify(reporter).write(data.capture(), any(ReportDirectory))
+
+        def result = data.value
+        assertThat(result.buildTime.elapsedMillis()).isEqualTo(finishTime.time - date(2017, JANUARY, 21).time)
+    }
+
+    private static Date date(int year, int month, int day) {
+        def calendar = Calendar.getInstance()
+        calendar.set(year, month, day, 0, 0, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        calendar.time
     }
 
     private static RepositoryEvent.Builder artifact_downloaded_but_not_found(Artifact artifact) {

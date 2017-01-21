@@ -3,6 +3,7 @@ package fr.jcgay.maven.profiler;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
+import com.google.common.base.Supplier;
 import fr.jcgay.maven.profiler.reporting.ReportDirectory;
 import fr.jcgay.maven.profiler.reporting.template.Data;
 import fr.jcgay.maven.profiler.reporting.template.EntryAndTime;
@@ -28,6 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import static fr.jcgay.maven.profiler.KnownElapsedTimeTicker.aStopWatchWithElapsedTime;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.apache.maven.execution.ExecutionEvent.Type.ProjectDiscoveryStarted;
 import static org.apache.maven.execution.ExecutionEvent.Type.SessionStarted;
 
 @Component(role = EventSpy.class, hint = "profiler", description = "Measure times taken by Maven.")
@@ -35,6 +39,7 @@ public class ProfilerEventSpy extends AbstractEventSpy {
 
     private final Statistics statistics;
     private final Configuration configuration;
+    private final Supplier<Date> now;
 
     @Requirement
     private Logger logger;
@@ -42,13 +47,20 @@ public class ProfilerEventSpy extends AbstractEventSpy {
     public ProfilerEventSpy() {
         this.statistics = new Statistics();
         this.configuration = Configuration.read();
+        this.now = new Supplier<Date>() {
+            @Override
+            public Date get() {
+                return new Date();
+            }
+        };
     }
 
     @VisibleForTesting
-    ProfilerEventSpy(Statistics statistics, Configuration configuration) {
+    ProfilerEventSpy(Statistics statistics, Configuration configuration, Supplier<Date> now) {
         this.statistics = statistics;
         this.configuration = configuration;
         this.logger = new ConsoleLogger();
+        this.now = now;
     }
 
     @Override
@@ -70,9 +82,16 @@ public class ProfilerEventSpy extends AbstractEventSpy {
             } else if (event instanceof ExecutionEvent) {
                 storeExecutionEvent((ExecutionEvent) event);
                 trySaveTopProject((ExecutionEvent) event);
+                storeStartTime((ExecutionEvent) event);
             } else if (event instanceof RepositoryEvent) {
                 storeDownloadingArtifacts((RepositoryEvent) event);
             }
+        }
+    }
+
+    private void storeStartTime(ExecutionEvent event) {
+        if (event.getType() == ProjectDiscoveryStarted) {
+            statistics.setStartTime(event.getSession().getStartTime());
         }
     }
 
@@ -80,13 +99,18 @@ public class ProfilerEventSpy extends AbstractEventSpy {
     public void close() throws Exception {
         super.close();
         if (configuration.isProfiling()) {
+            Date finishTime = now.get();
             Data context = new Data()
                     .setProjects(sortedProjects())
-                    .setDate(new Date())
+                    .setDate(finishTime)
                     .setName(statistics.topProject().getName())
                     .setGoals(Joiner.on(' ').join(statistics.goals()))
                     .setParameters(statistics.properties());
             setDownloads(context);
+
+            if (statistics.getStartTime() != null) {
+                context.setBuildTime(aStopWatchWithElapsedTime(MILLISECONDS.toNanos(finishTime.getTime() - statistics.getStartTime().getTime())));
+            }
 
             configuration.reporter().write(context, new ReportDirectory(statistics.topProject()));
         }

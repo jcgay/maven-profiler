@@ -6,6 +6,8 @@ import org.apache.maven.plugin.MojoExecution;
 import java.util.ArrayList;
 import java.util.List;
 
+import static fr.jcgay.maven.profiler.reporting.Format.ms;
+
 public class Project {
 
     private final String name;
@@ -33,13 +35,9 @@ public class Project {
         return time;
     }
 
-    public String getMillisTimeStamp() {
-        return String.valueOf(time.elapsedMillis()) + " ms";
-    }
-
     @Override
     public String toString() {
-        return String.format("{%s, %s, totalMojos = %d}", name, getMillisTimeStamp(), mojosWithTime.size());
+        return String.format("{%s, %s, totalMojos = %d}", name, ms(time), mojosWithTime.size());
     }
 
 }

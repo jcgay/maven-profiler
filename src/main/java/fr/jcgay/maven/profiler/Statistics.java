@@ -8,6 +8,7 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.artifact.Artifact;
 import org.slf4j.Logger;
 
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -28,6 +29,7 @@ public class Statistics {
     private MavenProject topProject;
     private Set<String> goals = emptySet();
     private Properties properties = new Properties();
+    private Date startTime;
 
     public Statistics setTopProject(MavenProject topProject) {
         this.topProject = topProject;
@@ -121,5 +123,13 @@ public class Statistics {
         LOGGER.debug("Stopping timer for project: " + project);
         projects.get(project).stop();
         return this;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getStartTime() {
+        return startTime;
     }
 }
