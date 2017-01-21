@@ -131,6 +131,8 @@ instead of sorted by execution time.
 
 [![Build Status](https://travis-ci.org/jcgay/maven-profiler.png)](https://travis-ci.org/jcgay/maven-profiler)
 [![Coverage Status](https://coveralls.io/repos/jcgay/maven-profiler/badge.svg?branch=master)](https://coveralls.io/r/jcgay/maven-profiler?branch=master)
+[![Quality Gate](https://sonarqube.com/api/badges/gate?key=fr.jcgay.maven:maven-profiler)](https://sonarqube.com/dashboard/index/fr.jcgay.maven:maven-profiler)
+[![Technical debt ratio](https://sonarqube.com/api/badges/measure?key=fr.jcgay.maven:maven-profiler&metric=sqale_debt_ratio)](https://sonarqube.com/dashboard/index/fr.jcgay.maven:maven-profiler)
 
 ## Release
 
