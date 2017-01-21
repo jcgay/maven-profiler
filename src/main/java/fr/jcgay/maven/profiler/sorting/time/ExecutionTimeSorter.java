@@ -24,9 +24,9 @@ class ExecutionTimeSorter {
 
     public List<Map.Entry<MojoExecution, Stopwatch>> getSortedMojosByTime(MavenProject project) {
         return Ordering.natural()
-                .onResultOf(StopWatchFunction.toElapsedTime())
-                .reverse()
-                .sortedCopy(timers.row(project).entrySet());
+            .onResultOf(StopWatchFunction.toElapsedTime())
+            .reverse()
+            .sortedCopy(timers.row(project).entrySet());
     }
 
     private static class StopWatchFunction implements Function<Map.Entry<MojoExecution, Stopwatch>, Long> {

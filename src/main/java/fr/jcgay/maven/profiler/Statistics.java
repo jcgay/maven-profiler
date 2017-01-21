@@ -77,7 +77,7 @@ public class Statistics {
     }
 
     public synchronized Statistics startProject(MavenProject project) {
-        LOGGER.debug("Starting timer for project: " + project);
+        LOGGER.debug("Starting timer for project: {}", project);
         projects.put(project, new Stopwatch().start());
         return this;
     }
@@ -120,7 +120,7 @@ public class Statistics {
     }
 
     public Statistics stopProject(MavenProject project) {
-        LOGGER.debug("Stopping timer for project: " + project);
+        LOGGER.debug("Stopping timer for project: {}", project);
         projects.get(project).stop();
         return this;
     }

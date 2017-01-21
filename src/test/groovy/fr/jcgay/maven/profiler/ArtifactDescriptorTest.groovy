@@ -1,4 +1,5 @@
 package fr.jcgay.maven.profiler
+
 import com.google.common.base.Stopwatch
 import org.eclipse.aether.artifact.Artifact
 import org.eclipse.aether.artifact.DefaultArtifact

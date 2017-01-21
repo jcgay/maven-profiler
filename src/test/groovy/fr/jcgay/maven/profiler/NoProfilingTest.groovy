@@ -1,4 +1,5 @@
 package fr.jcgay.maven.profiler
+
 import fr.jcgay.maven.profiler.reporting.Reporter
 import fr.jcgay.maven.profiler.sorting.Sorter
 import org.apache.maven.execution.ExecutionEvent

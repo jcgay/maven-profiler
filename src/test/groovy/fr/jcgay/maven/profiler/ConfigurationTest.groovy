@@ -59,17 +59,17 @@ class ConfigurationTest {
     @DataProvider
     Object[][] 'two formats'() {
         [['json,html'], ['JSON,HTML'], ['jSoN,HtMl']]
-    }    
-    
+    }
+
     @Test(dataProvider = 'two formats')
     void 'two report formats'(String format) {
         System.setProperty('profileFormat', format)
 
         def result = Configuration.read()
 
-        assertThat(result.reporter().delegates).extracting("class").containsExactly(JsonReporter,HtmlReporter)
+        assertThat(result.reporter().delegates).extracting("class").containsExactly(JsonReporter, HtmlReporter)
     }
-    
+
     @Test
     void 'do not sort result, keep execution order'() {
         System.setProperty('disableTimeSorting', 'true')

@@ -33,6 +33,8 @@ import static fr.jcgay.maven.profiler.KnownElapsedTimeTicker.aStopWatchWithElaps
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.maven.execution.ExecutionEvent.Type.ProjectDiscoveryStarted;
 import static org.apache.maven.execution.ExecutionEvent.Type.SessionStarted;
+import static org.eclipse.aether.RepositoryEvent.EventType.ARTIFACT_DOWNLOADED;
+import static org.eclipse.aether.RepositoryEvent.EventType.ARTIFACT_DOWNLOADING;
 
 @Component(role = EventSpy.class, hint = "profiler", description = "Measure times taken by Maven.")
 public class ProfilerEventSpy extends AbstractEventSpy {
@@ -101,11 +103,11 @@ public class ProfilerEventSpy extends AbstractEventSpy {
         if (configuration.isProfiling()) {
             Date finishTime = now.get();
             Data context = new Data()
-                    .setProjects(sortedProjects())
-                    .setDate(finishTime)
-                    .setName(statistics.topProject().getName())
-                    .setGoals(Joiner.on(' ').join(statistics.goals()))
-                    .setParameters(statistics.properties());
+                .setProjects(sortedProjects())
+                .setDate(finishTime)
+                .setName(statistics.topProject().getName())
+                .setGoals(Joiner.on(' ').join(statistics.goals()))
+                .setParameters(statistics.properties());
             setDownloads(context);
 
             if (statistics.getStartTime() != null) {
@@ -151,15 +153,13 @@ public class ProfilerEventSpy extends AbstractEventSpy {
 
     private void storeDownloadingArtifacts(RepositoryEvent event) {
         logger.debug(String.format("Received event (%s): %s", event.getClass(), event));
-        switch (event.getType()) {
-            case ARTIFACT_DOWNLOADING:
-                statistics.startDownload(event.getArtifact());
-                break;
-            case ARTIFACT_DOWNLOADED:
-                if (hasNoException(event)) {
-                    statistics.stopDownload(event.getArtifact());
-                }
-                break;
+        if (event.getType() == ARTIFACT_DOWNLOADING) {
+            statistics.startDownload(event.getArtifact());
+
+        } else if (event.getType() == ARTIFACT_DOWNLOADED) {
+            if (hasNoException(event)) {
+                statistics.stopDownload(event.getArtifact());
+            }
         }
     }
 

@@ -1,4 +1,5 @@
 package fr.jcgay.maven.profiler.reporting.html
+
 import fr.jcgay.maven.profiler.reporting.ReportDirectory
 import fr.jcgay.maven.profiler.reporting.template.Data
 import org.testng.annotations.Test

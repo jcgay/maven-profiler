@@ -1,4 +1,5 @@
 package fr.jcgay.maven.profiler.sorting.time
+
 import com.google.common.base.Stopwatch
 import org.apache.maven.model.Model
 import org.apache.maven.project.MavenProject
@@ -26,7 +27,7 @@ class ProjectsSorterTest {
     private static MavenProject aMavenProject(String name) {
         Model model = new Model()
         model.name = name
-        model.groupId= "groupId-$name"
+        model.groupId = "groupId-$name"
         model.artifactId = 'artifactId'
         model.version = 'version'
         new MavenProject(model)

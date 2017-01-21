@@ -1,4 +1,5 @@
 package fr.jcgay.maven.profiler
+
 import fr.jcgay.maven.profiler.reporting.Reporter
 import fr.jcgay.maven.profiler.sorting.execution.ByExecutionOrder
 import org.apache.maven.execution.ExecutionEvent
@@ -49,7 +50,7 @@ class ReportsWithSortingDisabledTest {
 
         def result = statistics.downloads()
         assertThat(result).hasSameSizeAs(artifacts)
-        result.eachWithIndex{ artifact, timer, artifactIndex ->
+        result.eachWithIndex { artifact, timer, artifactIndex ->
             assertThat(artifact).isEqualTo(artifacts.get(artifactIndex))
         }
     }
@@ -73,7 +74,7 @@ class ReportsWithSortingDisabledTest {
         profiler.close()
 
         def result = statistics.executions().row(project)
-        result.eachWithIndex {execution, timer, index ->
+        result.eachWithIndex { execution, timer, index ->
             assertThat(execution.goal).isEqualTo(mojos[index].get(0))
             assertThat(execution.executionId).isEqualTo(mojos[index].get(1))
         }
@@ -94,7 +95,7 @@ class ReportsWithSortingDisabledTest {
         profiler.close()
 
         def result = statistics.executions().rowMap()
-        result.eachWithIndex {project, executions, index ->
+        result.eachWithIndex { project, executions, index ->
             assertThat(project.model.name).isEqualTo(projects[index].model.name)
         }
     }
@@ -124,7 +125,7 @@ class ReportsWithSortingDisabledTest {
 
         def result = statistics.executions()
         assertThat(result.columnKeySet()).hasSize(11)
-        result.rowKeySet().eachWithIndex {project, index ->
+        result.rowKeySet().eachWithIndex { project, index ->
             assertThat(project).isEqualTo(originalMavenProject)
         }
     }
@@ -168,7 +169,7 @@ class ReportsWithSortingDisabledTest {
 
     private static RepositoryEvent.Builder aRepositoryEvent(RepositoryEvent.EventType type, Artifact artifact) {
         new RepositoryEvent.Builder(new DefaultRepositorySystemSession(), type)
-                .setArtifact(artifact)
+            .setArtifact(artifact)
     }
 
     private static MavenProject aMavenProject(String name) {
@@ -192,8 +193,8 @@ class ReportsWithSortingDisabledTest {
         String projectGoal = mavenProject.getDefaultGoal()
         String projectId = mavenProject.getId()
         ExecutionEvent projectStartEvent = aMojoEvent(ExecutionEvent.Type.ProjectStarted,
-                                                      projectGoal, projectId,
-                                                      mavenProject)
+            projectGoal, projectId,
+            mavenProject)
         profiler.onEvent(projectStartEvent)
     }
 
@@ -201,8 +202,8 @@ class ReportsWithSortingDisabledTest {
         String projectGoal = mavenProject.getDefaultGoal()
         String projectId = mavenProject.getId()
         ExecutionEvent projectStopEvent = aMojoEvent(ExecutionEvent.Type.ProjectSucceeded,
-                                                     projectGoal, projectId,
-                                                     mavenProject)
+            projectGoal, projectId,
+            mavenProject)
         profiler.onEvent(projectStopEvent)
     }
 

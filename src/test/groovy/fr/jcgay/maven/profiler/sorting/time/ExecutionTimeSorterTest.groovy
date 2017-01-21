@@ -1,4 +1,5 @@
 package fr.jcgay.maven.profiler.sorting.time
+
 import com.google.common.base.Stopwatch
 import com.google.common.collect.HashBasedTable
 import fr.jcgay.maven.profiler.KnownElapsedTimeTicker
@@ -28,11 +29,11 @@ class ExecutionTimeSorterTest {
         ExecutionTimeSorter result = ExecutionTimeSorter.instance(timers)
 
         assertThat(result.getSortedMojosByTime(project))
-                .has(MojoExecution.id('5'), atIndex(0))
-                .has(MojoExecution.id('4'), atIndex(1))
-                .has(MojoExecution.id('3'), atIndex(2))
-                .has(MojoExecution.id('2'), atIndex(3))
-                .has(MojoExecution.id('1'), atIndex(4))
+            .has(MojoExecution.id('5'), atIndex(0))
+            .has(MojoExecution.id('4'), atIndex(1))
+            .has(MojoExecution.id('3'), atIndex(2))
+            .has(MojoExecution.id('2'), atIndex(3))
+            .has(MojoExecution.id('1'), atIndex(4))
     }
 
     @Test

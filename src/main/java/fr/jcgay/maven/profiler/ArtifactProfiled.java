@@ -24,12 +24,12 @@ public class ArtifactProfiled implements Artifact {
     @Override
     public int hashCode() {
         return Objects.hashCode(
-                artifact.getArtifactId(),
-                artifact.getGroupId(),
-                artifact.getVersion(),
-                artifact.getExtension(),
-                artifact.getClassifier(),
-                artifact.getBaseVersion()
+            artifact.getArtifactId(),
+            artifact.getGroupId(),
+            artifact.getVersion(),
+            artifact.getExtension(),
+            artifact.getClassifier(),
+            artifact.getBaseVersion()
         );
     }
 
@@ -43,11 +43,11 @@ public class ArtifactProfiled implements Artifact {
         }
         final ArtifactProfiled other = (ArtifactProfiled) obj;
         return equal(this.artifact.getArtifactId(), other.artifact.getArtifactId())
-                && equal(this.artifact.getGroupId(), other.artifact.getGroupId())
-                && equal(this.artifact.getVersion(), other.artifact.getVersion())
-                && equal(this.artifact.getExtension(), other.artifact.getExtension())
-                && equal(this.artifact.getClassifier(), other.artifact.getClassifier())
-                && equal(this.artifact.getBaseVersion(), other.artifact.getBaseVersion());
+            && equal(this.artifact.getGroupId(), other.artifact.getGroupId())
+            && equal(this.artifact.getVersion(), other.artifact.getVersion())
+            && equal(this.artifact.getExtension(), other.artifact.getExtension())
+            && equal(this.artifact.getClassifier(), other.artifact.getClassifier())
+            && equal(this.artifact.getBaseVersion(), other.artifact.getBaseVersion());
     }
 
     @Override

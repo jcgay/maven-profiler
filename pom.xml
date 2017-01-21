@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -11,6 +12,7 @@
     <groupId>fr.jcgay.maven</groupId>
     <artifactId>maven-profiler</artifactId>
     <version>2.5-SNAPSHOT</version>
+    <description>Log Maven mojos execution time</description>
 
     <prerequisites>
         <maven>3.0</maven>
@@ -20,8 +22,8 @@
         <url>https://github.com/jcgay/maven-profiler.git</url>
         <connection>scm:git:git://github.com/jcgay/maven-profiler.git</connection>
         <developerConnection>scm:git:git@github.com:jcgay/maven-profiler.git</developerConnection>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
