@@ -64,7 +64,7 @@ Also you can add the property `disableTimeSorting` if you want the reported time
 
     mvn install -Dprofile -DdisableTimeSorting
 
-This will also works when `mvn` is executed on multiple threads (option `-T`).
+This also works when `mvn` is executed on multiple threads (option `-T`).
 
 ### HTML
 
