@@ -54,17 +54,41 @@ Use property `profile` when running Maven.
 
 	mvn install -Dprofile
 
-This will generate a report in `.profiler` folder.
+This will generate a report in `.profiler` folder.  
+This also works when `mvn` is executed on multiple threads (option `-T`).
 
-One can choose between `HTML` (by default) or `JSON` report using property `profileFormat`. Or you can compose multiple reporters separated by comma:
+### Report format
+
+One can choose between `HTML` (by default) or `JSON` report using property `profileFormat`. 
+
+    mvn install -Dprofile -DprofileFormat=HTML
+
+Or you can compose multiple reporters separated by comma:
 
     mvn install -Dprofile -DprofileFormat=JSON,HTML
+
+### Change sorting
 
 Also you can add the property `disableTimeSorting` if you want the reported times to be in the order of execution instead of sorted by execution time.
 
     mvn install -Dprofile -DdisableTimeSorting
 
-This also works when `mvn` is executed on multiple threads (option `-T`).
+### Report directory
+
+Report default directory (`.profiler`) can be customized.  
+You can set it as a Maven property, for example in `pom.xml`:
+
+```
+<properties>
+    <maven-profiler-report-directory>${project.build.directory}/custom-directory</maven-profiler-report-directory>
+</properties>
+```
+
+or you can define it using a system property:
+
+    mvn install -Dprofile -Dmaven-profiler-report-directory=/tmp/profiler-custom-report
+
+## Output examples
 
 ### HTML
 

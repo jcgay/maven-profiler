@@ -11,7 +11,16 @@ public class ReportDirectory {
     private final File directory;
 
     public ReportDirectory(MavenProject project) {
-        directory = new File(project.getBasedir(), ".profiler");
+        String directoryInProjectProperties = project.getProperties().getProperty("maven-profiler-report-directory");
+        String directoryInSystemProperties = System.getProperty("maven-profiler-report-directory");
+        if (directoryInProjectProperties != null) {
+            directory = new File(directoryInProjectProperties);
+        } else if (directoryInSystemProperties != null) {
+            directory = new File(directoryInSystemProperties);
+        } else {
+            directory = new File(project.getBasedir(), ".profiler");
+        }
+
         if (!directory.exists() && !directory.mkdirs()) {
             throw new RuntimeException("Cannot create file to write profiler report: " + directory);
         }
