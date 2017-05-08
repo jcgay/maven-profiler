@@ -1,8 +1,8 @@
-#Maven Profiler
+# Maven Profiler
 
 A time execution recorder for Maven which log time taken by each mojo in your build lifecycle.
 
-##Installation
+## Installation
 
 `$M2_HOME` refers to maven installation folder.
 
@@ -48,7 +48,7 @@ Get [maven-profiler](http://dl.bintray.com/jcgay/maven/fr/jcgay/maven/maven-prof
 (with limited functionality, kept for compatibility)
 Get [maven-profiler](http://dl.bintray.com/jcgay/maven/com/github/jcgay/maven/maven-profiler/1.0/maven-profiler-1.0.jar) and copy it in `%M2_HOME%/lib/ext` folder.
 
-##Usage
+## Usage
 
 Use property `profile` when running Maven.
 
