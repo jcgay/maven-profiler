@@ -38,7 +38,7 @@ class MavenStubs {
     }
 
     static ExecutionEvent aProjectEvent(ExecutionEvent.Type type) {
-        aMojoEvent(type, new MojoExecution(new Plugin(), 'goal', 'execution.id'), aMavenProject('project'))
+        aMojoEvent(type, aMojoExecution('execution.id'), aMavenProject('project'))
     }
 
     static RepositoryEvent.Builder aRepositoryEvent(RepositoryEvent.EventType type, Artifact artifact) {
@@ -47,6 +47,14 @@ class MavenStubs {
     }
 
     static Artifact anArtifact() {
-        ArtifactProfiled.of(new DefaultArtifact('groupId', 'artifactId', 'jar', '1.0'))
+        anArtifact('artifactId')
+    }
+
+    static Artifact anArtifact(String artifactId) {
+        ArtifactProfiled.of(new DefaultArtifact('groupId', artifactId, 'jar', '1.0'))
+    }
+
+    static MojoExecution aMojoExecution(String id) {
+        new MojoExecution(new Plugin(), 'goal', id)
     }
 }

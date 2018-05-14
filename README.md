@@ -67,13 +67,13 @@ The extension also works when `mvn` is executed on multiple threads (option `-T`
 
 ### Report format
 
-One can choose between `HTML` (by default) or `JSON` report using property `profileFormat`.
+One can choose between `HTML` (by default), `JSON` or `CONSOLE` report using property `profileFormat`.
 
     mvn install -Dprofile -DprofileFormat=HTML
 
 Or you can compose multiple reporters separated by comma:
 
-    mvn install -Dprofile -DprofileFormat=JSON,HTML
+    mvn install -Dprofile -DprofileFormat=JSON,HTML,CONSOLE
 
 ### Change sorting
 
@@ -195,6 +195,38 @@ User parameters could leak sensitive data, you can disable reporting them using:
     }
   ]
 }
+```
+
+### CONSOLE
+
+    mvn install -Dprofile -DprofileFormat=CONSOLE
+
+```
+╒════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╕
+│ maven-profiler (21,27 s)                                                                                                                                   │
+├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Run install on 2021/12/09 22:10:49 without parameters                                                                                                      │
+├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ maven-profiler (21,07 s)                                                                                                                                   │
+├────────────────────────────────────────────────────────────────────────────────────────────────────┬───────────────────────────────────────────────────────┤
+│ Plugin execution                                                                                   │ Duration                                              │
+├────────────────────────────────────────────────────────────────────────────────────────────────────┼───────────────────────────────────────────────────────┤
+│ org.apache.maven.plugins:maven-invoker-plugin:3.2.2:run {execution: integration-test}              │ 9,085 s                                               │
+│ org.apache.maven.plugins:maven-surefire-plugin:2.22.2:test {execution: default-test}               │ 6,286 s                                               │
+│ org.codehaus.gmavenplus:gmavenplus-plugin:1.12.1:compileTests {execution: default}                 │ 2,281 s                                               │
+│ org.apache.maven.plugins:maven-shade-plugin:3.2.4:shade {execution: default}                       │ 1,264 s                                               │
+│ org.apache.maven.plugins:maven-invoker-plugin:3.2.2:install {execution: integration-test}          │ 464,0 ms                                              │
+│ org.apache.maven.plugins:maven-enforcer-plugin:1.4.1:enforce {execution: enforce-maven}            │ 339,5 ms                                              │
+│ org.apache.maven.plugins:maven-compiler-plugin:3.8.1:compile {execution: default-compile}          │ 269,1 ms                                              │
+│ org.codehaus.plexus:plexus-component-metadata:2.1.0:generate-metadata {execution: default}         │ 244,5 ms                                              │
+│ org.apache.maven.plugins:maven-jar-plugin:3.2.0:jar {execution: default-jar}                       │ 190,1 ms                                              │
+│ org.apache.maven.plugins:maven-source-plugin:3.2.1:jar-no-fork {execution: attach-sources}         │ 132,9 ms                                              │
+│ org.apache.maven.plugins:maven-resources-plugin:3.2.0:resources {execution: default-resources}     │ 109,6 ms                                              │
+│ org.apache.maven.plugins:maven-install-plugin:2.5.2:install {execution: default-install}           │ 64,26 ms                                              │
+│ org.apache.maven.plugins:maven-compiler-plugin:3.8.1:testCompile {execution: default-testCompile}  │ 4,127 ms                                              │
+│ org.apache.maven.plugins:maven-resources-plugin:3.2.0:testResources {execution:                    │ 2,532 ms                                              │
+│ default-testResources}                                                                             │                                                       │
+╘════════════════════════════════════════════════════════════════════════════════════════════════════╧═══════════════════════════════════════════════════════╛
 ```
 
 ## Build status
