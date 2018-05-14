@@ -53,6 +53,16 @@
             <version>0.9.5</version>
         </dependency>
         <dependency>
+            <groupId>de.vandermeer</groupId>
+            <artifactId>asciitable-j7</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>stringtemplate</artifactId>
+            <version>4.0.2</version>
+        </dependency>
+        <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>7.4.0</version>
@@ -195,7 +205,7 @@
         </plugins>
     </build>
 
-    <profiles>
+    <!--profiles>
         <profile>
             <id>build-with-toolchains</id>
             <activation>
@@ -223,6 +233,6 @@
                 </plugins>
             </build>
         </profile>
-    </profiles>
+    </profiles-->
 
 </project>
