@@ -24,7 +24,7 @@ import static org.apache.maven.execution.ExecutionEvent.Type.*
 import static org.assertj.core.api.Assertions.assertThat
 import static org.eclipse.aether.RepositoryEvent.EventType.ARTIFACT_DOWNLOADED
 import static org.eclipse.aether.RepositoryEvent.EventType.ARTIFACT_DOWNLOADING
-import static org.mockito.Matchers.any
+import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.verify
 

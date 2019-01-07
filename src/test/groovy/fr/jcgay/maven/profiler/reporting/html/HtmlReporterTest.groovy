@@ -2,7 +2,10 @@ package fr.jcgay.maven.profiler.reporting.html
 
 import fr.jcgay.maven.profiler.reporting.ReportDirectory
 import fr.jcgay.maven.profiler.reporting.template.Data
+import org.assertj.core.api.Condition
 import org.testng.annotations.Test
+
+import java.util.function.Predicate
 
 import static fr.jcgay.maven.profiler.MavenStubs.aMavenTopProject
 import static org.assertj.core.api.Assertions.assertThat
@@ -21,6 +24,12 @@ class HtmlReporterTest {
             .exists()
             .isDirectory()
         assertThat(destination.list())
-            .haveAtLeast(1, { it.startsWith('profiler-report-') && it.endsWith('.html') })
+            .haveAtLeast(1, aProfilerReportHtmlFile())
+    }
+
+    private static Condition<String> aProfilerReportHtmlFile() {
+        return new Condition<String>(
+            { it.startsWith('profiler-report-') && it.endsWith('.html')} as Predicate<String>,
+            "a HTML file with name starting with 'profiler-report'")
     }
 }

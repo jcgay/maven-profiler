@@ -3,6 +3,7 @@ package fr.jcgay.maven.profiler.sorting.time
 import com.google.common.base.Stopwatch
 import org.apache.maven.model.Model
 import org.apache.maven.project.MavenProject
+import org.assertj.core.api.iterable.Extractor
 import org.testng.annotations.Test
 
 import static fr.jcgay.maven.profiler.KnownElapsedTimeTicker.aStopWatchWithElapsedTime
@@ -21,7 +22,7 @@ class ProjectsSorterTest {
 
         List<MavenProject> result = ProjectsSorter.byExecutionTime(projects)
 
-        assertThat(result).extracting({ it.name }).containsExactly('3', '2', '1')
+        assertThat(result).extracting({ it.name } as Extractor<MavenProject, String>).containsExactly('3', '2', '1')
     }
 
     private static MavenProject aMavenProject(String name) {
