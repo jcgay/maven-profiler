@@ -16,20 +16,10 @@ public final class Files {
     }
 
     public static void write(File target, String content) {
-        FileWriter writer = null;
-        try {
-            writer = new FileWriter(target);
+        try (FileWriter writer = new FileWriter(target)) {
             writer.write(content);
         } catch (IOException e) {
             LOGGER.error("Cannot write profiler report.", e);
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (IOException e) {
-                    LOGGER.error("Error while closing resource.", e);
-                }
-            }
         }
     }
 }

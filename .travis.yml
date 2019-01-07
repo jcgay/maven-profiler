@@ -6,16 +6,14 @@ addons:
     token:
       secure: "OvWUkclVdgXiRHgynLvt+nWhdScIoxSlu8hEhZKSHQCJZ6sKObSnH0sxfY1bJbUYLwnwTBiBBRl26BEzABN0vr/2P6A/4fyXBg3rxsidPcb+YzGXNTwxrTvr1g/Jxg6zkYlBkvFVI5GL8ZRo5m/tayYaA4o3RxY40qKy5v3MvhE="
 before_install:
-  - jdk_switcher use openjdk6
-  - sed -i "s|\[JDK6\]|$JAVA_HOME|g" etc/toolchains.xml
   - jdk_switcher use oraclejdk8
 install:
-  - ./mvnw install -Dinvoker.skip=true -DskipTests=true -B -V -t etc/toolchains.xml
+  - ./mvnw install -Dinvoker.skip=true -DskipTests=true -B -V
 script:
-  - ./mvnw package sonar:sonar -Prun-coverage -B -t etc/toolchains.xml
+  - ./mvnw package sonar:sonar -Prun-coverage -B
 after_success:
-  - "[[ ${TRAVIS_PULL_REQUEST} == 'false' ]] && [[ ${TRAVIS_TAG} == '' ]] && ./mvnw deploy -Dinvoker.skip=true -DskipTests --settings etc/deploy-settings.xml -t etc/toolchains.xml"
-  - ./mvnw verify coveralls:report -Dinvoker.skip=true -Prun-coverage -t etc/toolchains.xml
+  - "[[ ${TRAVIS_PULL_REQUEST} == 'false' ]] && [[ ${TRAVIS_TAG} == '' ]] && ./mvnw deploy -Dinvoker.skip=true -DskipTests --settings etc/deploy-settings.xml"
+  - ./mvnw verify coveralls:report -Dinvoker.skip=true -Prun-coverage
 env:
   global:
     - secure: cttGV5bt0VuZZXHK0yo9rfszAjX67+pcRKMBjGuFEdr3v8uD55ho2qrXAtKEbG5x/g1atBXKD3HhBzK5Mb00XDkF93TQdX9veO6619xcVqQ7LdzPDIbbpX7lrS7vIaUaM77+hCtHFEKZs6+DVyeL93z0Vy7GiIAnRAnGomlmAwc=

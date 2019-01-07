@@ -26,11 +26,7 @@ public class Configuration {
     private static final Function<String,Reporter> reporters =  compose(forMap(ImmutableMap.<String,Reporter>builder()
     		.put("html", new HtmlReporter())
     		.put("json", new JsonReporter())
-    		.build()), new Function<String,String>(){
-				@Override
-				public String apply(String it) {
-					return it.toLowerCase();
-				}});
+    		.build()), String::toLowerCase);
 
     private final boolean isProfiling;
     private final Reporter reporter;

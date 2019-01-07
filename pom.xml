@@ -25,6 +25,8 @@
     </scm>
 
     <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -175,9 +177,9 @@
 
     <profiles>
         <profile>
-            <id>build-with-jdk-6</id>
+            <id>build-with-toolchains</id>
             <activation>
-                <jdk>[1.7,)</jdk>
+                <jdk>!1.8</jdk>
             </activation>
             <build>
                 <plugins>
@@ -193,7 +195,7 @@
                         <configuration>
                             <toolchains>
                                 <jdk>
-                                    <version>1.6</version>
+                                    <version>${maven.compiler.target}</version>
                                 </jdk>
                             </toolchains>
                         </configuration>
