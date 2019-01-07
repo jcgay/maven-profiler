@@ -1,6 +1,5 @@
 package fr.jcgay.maven.profiler.sorting.time;
 
-import com.google.common.base.Function;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
@@ -23,11 +22,6 @@ class ProjectsSorter {
             }
         };
 
-        return Lists.transform(descending.sortedCopy(projects.entrySet()), new Function<Map.Entry<T, Stopwatch>, T>() {
-            @Override
-            public T apply(Map.Entry<T, Stopwatch> input) {
-                return input.getKey();
-            }
-        });
+        return Lists.transform(descending.sortedCopy(projects.entrySet()), Map.Entry::getKey);
     }
 }

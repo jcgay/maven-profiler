@@ -22,9 +22,9 @@ public class Statistics {
 
     private static final Logger LOGGER = getLogger(Statistics.class);
 
-    private final Map<MavenProject, Stopwatch> projects = new LinkedHashMap<MavenProject, Stopwatch>();
-    private final Map<MavenProject, Map<MojoExecution, Stopwatch>> executions = new LinkedHashMap<MavenProject, Map<MojoExecution, Stopwatch>>();
-    private final Map<Artifact, Stopwatch> downloadTimers = new LinkedHashMap<Artifact, Stopwatch>();
+    private final Map<MavenProject, Stopwatch> projects = new LinkedHashMap<>();
+    private final Map<MavenProject, Map<MojoExecution, Stopwatch>> executions = new LinkedHashMap<>();
+    private final Map<Artifact, Stopwatch> downloadTimers = new LinkedHashMap<>();
 
     private MavenProject topProject;
     private Set<String> goals = emptySet();
@@ -90,11 +90,7 @@ public class Statistics {
 
     public synchronized Statistics startExecution(MavenProject project, MojoExecution execution) {
         LOGGER.debug("Starting timer for mojo [{}] in project [{}].", execution, project);
-        Map<MojoExecution, Stopwatch> projectExecutions = executions.get(project);
-        if (projectExecutions == null) {
-            projectExecutions = new LinkedHashMap<MojoExecution, Stopwatch>();
-            executions.put(project, projectExecutions);
-        }
+        Map<MojoExecution, Stopwatch> projectExecutions = executions.computeIfAbsent(project, k -> new LinkedHashMap<>());
         projectExecutions.put(execution, new Stopwatch().start());
         return this;
     }

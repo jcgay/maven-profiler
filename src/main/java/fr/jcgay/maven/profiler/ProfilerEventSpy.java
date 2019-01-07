@@ -49,12 +49,7 @@ public class ProfilerEventSpy extends AbstractEventSpy {
     public ProfilerEventSpy() {
         this.statistics = new Statistics();
         this.configuration = Configuration.read();
-        this.now = new Supplier<Date>() {
-            @Override
-            public Date get() {
-                return new Date();
-            }
-        };
+        this.now = Date::new;
     }
 
     @VisibleForTesting
@@ -79,7 +74,7 @@ public class ProfilerEventSpy extends AbstractEventSpy {
         if (configuration.isProfiling()) {
             if (event instanceof DefaultMavenExecutionRequest) {
                 DefaultMavenExecutionRequest mavenEvent = (DefaultMavenExecutionRequest) event;
-                statistics.setGoals(new LinkedHashSet<String>(mavenEvent.getGoals()));
+                statistics.setGoals(new LinkedHashSet<>(mavenEvent.getGoals()));
                 statistics.setProperties(mavenEvent.getUserProperties());
             } else if (event instanceof ExecutionEvent) {
                 storeExecutionEvent((ExecutionEvent) event);
@@ -127,12 +122,12 @@ public class ProfilerEventSpy extends AbstractEventSpy {
     private List<Project> sortedProjects() {
         Sorter sorter = configuration.sorter();
 
-        List<Project> result = new ArrayList<Project>();
+        List<Project> result = new ArrayList<>();
         Map<MavenProject, Stopwatch> allProjectsWithTimer = statistics.projects();
         for (MavenProject project : sorter.projects(allProjectsWithTimer)) {
             Project currentProject = new Project(project.getName(), allProjectsWithTimer.get(project));
             for (Entry<MojoExecution, Stopwatch> mojo : sorter.mojoExecutionsOf(project, statistics.executions())) {
-                currentProject.addMojoTime(new EntryAndTime<MojoExecution>(mojo.getKey(), mojo.getValue()));
+                currentProject.addMojoTime(new EntryAndTime<>(mojo.getKey(), mojo.getValue()));
             }
             result.add(currentProject);
         }
@@ -142,9 +137,9 @@ public class ProfilerEventSpy extends AbstractEventSpy {
     private void setDownloads(Data data) {
         Map<Artifact, Stopwatch> downloadedArtifacts = statistics.downloads();
 
-        List<EntryAndTime<Artifact>> result = new ArrayList<EntryAndTime<Artifact>>();
+        List<EntryAndTime<Artifact>> result = new ArrayList<>();
         for (Artifact artifact : configuration.sorter().downloads(downloadedArtifacts)) {
-            result.add(new EntryAndTime<Artifact>(artifact, downloadedArtifacts.get(artifact)));
+            result.add(new EntryAndTime<>(artifact, downloadedArtifacts.get(artifact)));
         }
 
         data.setDownloads(result)

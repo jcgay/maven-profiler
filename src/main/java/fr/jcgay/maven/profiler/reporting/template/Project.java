@@ -12,7 +12,7 @@ public class Project {
 
     private final String name;
     private final Stopwatch time;
-    private final List<EntryAndTime<MojoExecution>> mojosWithTime = new ArrayList<EntryAndTime<MojoExecution>>();
+    private final List<EntryAndTime<MojoExecution>> mojosWithTime = new ArrayList<>();
 
     public Project(String name, Stopwatch time) {
         this.name = name;

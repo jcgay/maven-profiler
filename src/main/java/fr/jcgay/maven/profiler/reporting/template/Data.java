@@ -23,11 +23,11 @@ public class Data {
     private Properties parameters;
 
     public List<Project> getProjects() {
-        return firstNonNull(projects, Collections.<Project>emptyList());
+        return firstNonNull(projects, Collections.emptyList());
     }
 
     public List<EntryAndTime<Artifact>> getDownloads() {
-        return firstNonNull(downloads, Collections.<EntryAndTime<Artifact>>emptyList());
+        return firstNonNull(downloads, Collections.emptyList());
     }
 
     public Stopwatch getTotalDownloadTime() {
