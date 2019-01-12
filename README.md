@@ -186,8 +186,8 @@ or you can define it using a system property:
 
 [![Build Status](https://travis-ci.org/jcgay/maven-profiler.png)](https://travis-ci.org/jcgay/maven-profiler)
 [![Coverage Status](https://coveralls.io/repos/jcgay/maven-profiler/badge.svg?branch=master)](https://coveralls.io/r/jcgay/maven-profiler?branch=master)
-[![Quality Gate](https://sonarqube.com/api/badges/gate?key=fr.jcgay.maven:maven-profiler)](https://sonarqube.com/dashboard/index/fr.jcgay.maven:maven-profiler)
-[![Technical debt ratio](https://sonarqube.com/api/badges/measure?key=fr.jcgay.maven:maven-profiler&metric=sqale_debt_ratio)](https://sonarqube.com/dashboard/index/fr.jcgay.maven:maven-profiler)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=fr.jcgay.maven%3Amaven-profiler&metric=alert_status)](https://sonarqube.com/dashboard/index/fr.jcgay.maven:maven-profiler)
+[![Technical debt ratio](https://sonarcloud.io/api/project_badges/measure?project=fr.jcgay.maven%3Amaven-profiler&metric=sqale_index)](https://sonarqube.com/dashboard/index/fr.jcgay.maven:maven-profiler)
 
 ## Release
 

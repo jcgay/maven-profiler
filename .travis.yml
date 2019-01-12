@@ -1,7 +1,7 @@
 sudo: false
 language: java
 addons:
-  sonarqube:
+  sonarcloud:
     organization: "jcgay-github"
     token:
       secure: "OvWUkclVdgXiRHgynLvt+nWhdScIoxSlu8hEhZKSHQCJZ6sKObSnH0sxfY1bJbUYLwnwTBiBBRl26BEzABN0vr/2P6A/4fyXBg3rxsidPcb+YzGXNTwxrTvr1g/Jxg6zkYlBkvFVI5GL8ZRo5m/tayYaA4o3RxY40qKy5v3MvhE="
