@@ -1,26 +1,30 @@
 package fr.jcgay.maven.profiler.reporting.console;
 
-import fr.jcgay.maven.profiler.reporting.template.Data;
-
-import javax.annotation.Nullable;
-import org.stringtemplate.v4.ST;
 import com.google.common.base.Function;
+import de.vandermeer.asciitable.AsciiTable;
+import fr.jcgay.maven.profiler.reporting.template.Data;
+import fr.jcgay.maven.profiler.reporting.template.Project;
 
 public enum ToHumanReadable implements Function<Data, String> {
    INSTANCE;
 
    @Override
-   public String apply(@Nullable Data data) {
-      ST st = new ST(template());
-      st.add("name", data.getName());
-      st.add("buildTime", data.getBuildTime());
-      st.add("goals", data.getGoals());
-      st.add("formattedDate", data.getFormattedDate());
-      st.add("parameters", data.getParameters());
-      st.add("projects", data.getProjects());
-      st.add("downloads", data.getDownloads());
-      st.add("totalDownloadTime", data.getTotalDownloadTime());
-      return st.render();
+   public String apply(Data data) {
+       StringBuilder result = new StringBuilder();
+       result.append("Project: " + data.getName() + " built in " + data.getBuildTime());
+       result.append(System.lineSeparator());
+       result.append("Run " + data.getGoals() + " on " + data.getFormattedDate() + " with parameters: " + data.getParameters());
+       result.append(System.lineSeparator());
+       result.append("Projects");
+       result.append(System.lineSeparator());
+
+       AsciiTable at = new AsciiTable();
+       at.addRule();
+       for (Project project : data.getProjects()) {
+           at.addRow(project.getName(), project.getTime());
+           at.addRule();
+       }
+       return result + at.render();
    }
 
    private String template() {

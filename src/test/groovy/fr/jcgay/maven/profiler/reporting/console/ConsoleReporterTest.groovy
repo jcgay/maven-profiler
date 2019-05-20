@@ -1,14 +1,20 @@
 package fr.jcgay.maven.profiler.reporting.console
 
+
 import fr.jcgay.maven.profiler.reporting.template.Data
-import org.assertj.core.api.Assertions
+import fr.jcgay.maven.profiler.reporting.template.EntryAndTime
+import fr.jcgay.maven.profiler.reporting.template.Project
+import org.apache.maven.model.Plugin
+import org.apache.maven.plugin.MojoExecution
 import org.testng.annotations.AfterMethod
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
 
 import java.text.SimpleDateFormat
 
-import static fr.jcgay.maven.profiler.MavenStubs.aMavenTopProject
+import static fr.jcgay.maven.profiler.KnownElapsedTimeTicker.aStopWatchWithElapsedTime
+import static java.util.Collections.singletonList
+import static org.assertj.core.api.Assertions.assertThat
 
 class ConsoleReporterTest {
 
@@ -26,15 +32,27 @@ class ConsoleReporterTest {
 
     @Test
     void 'write report to console'() {
-        def project = aMavenTopProject('test-project')
-
         def date = new Date()
-        new ConsoleReporter()
-            .write(new Data().setDate(date), null)
+        def project = new Project("project-1", aStopWatchWithElapsedTime(100L))
+        project.addMojoTime(new EntryAndTime<MojoExecution>(new MojoExecution(new Plugin(), 'goal', 'execution.id'), aStopWatchWithElapsedTime(50)))
+        def data = new Data()
+            .setProjects(singletonList(project))
+            .setName("test-project")
+            .setBuildTime(aStopWatchWithElapsedTime(834L))
+            .setGoals("clean verify")
+            .setDate(date)
 
-        Assertions.assertThat(outContent.toString()).contains("Project:  built in")
-        Assertions.assertThat(outContent.toString()).contains("Run  on " + new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date) + " with parameters:")
-        Assertions.assertThat(outContent.toString()).contains("Projects: ")
-        Assertions.assertThat(outContent.toString()).contains("Artifact Downloading")
+        new ConsoleReporter().write(data, null)
+
+        assertThat(printable(outContent.toString())).isEqualTo(printable(String.format(
+            "┌──────────────────────────────────────────────────────────────────────────────┐\n" +
+                "│Project: test-project built in 834,0 ns                                       │\n" +
+                "│Run clean verify on %s with parameters: {}                   │\n" +
+                "└──────────────────────────────────────────────────────────────────────────────┘\n",
+            new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date))))
+    }
+
+    static String printable(String string) {
+        string.replaceAll(" ", "·").replaceAll( "[\n\r]+", "¬\n" )
     }
 }
