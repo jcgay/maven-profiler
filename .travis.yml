@@ -10,7 +10,7 @@ before_install:
 install:
   - ./mvnw install -Dinvoker.skip=true -DskipTests=true -B -V
 script:
-  - ./mvnw package sonar:sonar -Prun-coverage -B
+  - ./mvnw package -Prun-coverage -B
 after_success:
   - "[[ ${TRAVIS_PULL_REQUEST} == 'false' ]] && [[ ${TRAVIS_TAG} == '' ]] && ./mvnw deploy -Dinvoker.skip=true -DskipTests --settings etc/deploy-settings.xml"
   - ./mvnw verify coveralls:report -Dinvoker.skip=true -Prun-coverage
