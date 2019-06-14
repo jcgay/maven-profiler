@@ -5,7 +5,7 @@
     <parent>
         <groupId>fr.jcgay.maven</groupId>
         <artifactId>jcgay-build-configuration</artifactId>
-        <version>1.16</version>
+        <version>1.17</version>
     </parent>
 
     <groupId>fr.jcgay.maven</groupId>
@@ -61,13 +61,13 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>2.23.4</version>
+            <version>2.28.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.11.1</version>
+            <version>3.12.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -91,7 +91,7 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy</artifactId>
-            <version>2.4.16</version>
+            <version>2.5.7</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
