@@ -81,7 +81,12 @@ public class Configuration {
     }
 
     private static String getProfileName() {
-        return System.getProperty(PROFILE, "");
+        String profile = System.getProperty(PROFILE, "");
+        if (profile.equals("true")) {
+            // Use empty name if the property is specified as `-Dprofile`
+            return "";
+        }
+        return profile;
     }
 
     private static boolean isActive() {

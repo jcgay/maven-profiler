@@ -1,6 +1,6 @@
 package fr.jcgay.maven.profiler
 
-import com.google.common.collect.ImmutableList
+
 import fr.jcgay.maven.profiler.reporting.html.HtmlReporter
 import fr.jcgay.maven.profiler.reporting.json.JsonReporter
 import fr.jcgay.maven.profiler.sorting.execution.ByExecutionOrder
@@ -21,11 +21,11 @@ class ConfigurationTest {
     }
 
     @DataProvider
-    Object[][] 'valid profile properties'() {
+    Object[][] 'active profile properties'() {
         [[""], ["true"], ["Profile Name"]]
     }
 
-    @Test(dataProvider = 'valid profile properties')
+    @Test(dataProvider = 'active profile properties')
     void 'indicate that profiling is active'(String profileValue) {
         System.setProperty('profile', profileValue)
 
@@ -34,13 +34,18 @@ class ConfigurationTest {
         assertThat(result.isProfiling()).isTrue()
     }
 
-    @Test(dataProvider = 'valid profile properties')
-    void 'keeps profile name'(String profileValue) {
+    @DataProvider
+    Object[][] 'profile names'() {
+        [["", ""], ["true", ""], ["Profile Name", "Profile Name"]]
+    }
+
+    @Test(dataProvider = 'profile names')
+    void 'keeps profile name'(String profileValue, String expectedName) {
         System.setProperty('profile', profileValue)
 
         def result = Configuration.read()
 
-        assertThat(result.profileName()).isEqualTo(profileValue);
+        assertThat(result.profileName()).isEqualTo(expectedName)
     }
 
     @DataProvider
@@ -99,7 +104,7 @@ class ConfigurationTest {
         def result = Configuration.read()
 
         assertThat(result.isProfiling()).isFalse()
-        assertThat(result.profileName()).isEmpty();
+        assertThat(result.profileName()).isEmpty()
         assertThat(result.reporter().delegates).extracting("class").containsExactly(HtmlReporter)
         assertThat(result.sorter()).isExactlyInstanceOf(ByExecutionTime)
     }
