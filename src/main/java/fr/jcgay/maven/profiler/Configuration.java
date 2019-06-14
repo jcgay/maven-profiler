@@ -14,6 +14,7 @@ import java.util.List;
 
 import static com.google.common.base.Functions.compose;
 import static com.google.common.base.Functions.forMap;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Collections2.transform;
 import static java.util.Arrays.asList;
 
@@ -29,21 +30,29 @@ public class Configuration {
     		.build()), String::toLowerCase);
 
     private final boolean isProfiling;
+    private final String profileName;
     private final Reporter reporter;
     private final Sorter sorter;
 
-    public Configuration(boolean isProfiling, Reporter reporter, Sorter sorter) {
+    public Configuration(boolean isProfiling, String profileName, Reporter reporter,
+        Sorter sorter) {
         this.isProfiling = isProfiling;
+        this.profileName = checkNotNull(profileName);
         this.reporter = reporter;
         this.sorter = sorter;
     }
 
     public static Configuration read() {
-        return new Configuration(isActive(), chooseReporter(), chooseSorter());
+        return new Configuration(isActive(), getProfileName(), chooseReporter(), chooseSorter());
     }
 
     public boolean isProfiling() {
         return isProfiling;
+    }
+
+    /** Returns the profile name. Never {@code null}, may be empty if not provided. */
+    public String profileName() {
+        return profileName;
     }
 
     public Reporter reporter() {
@@ -69,6 +78,15 @@ public class Configuration {
     private static boolean isSortingActive() {
         String parameter = System.getProperty(DISABLE_TIME_SORTING);
         return parameter == null || "false".equalsIgnoreCase(parameter);
+    }
+
+    private static String getProfileName() {
+        String profile = System.getProperty(PROFILE, "");
+        if (profile.equals("true")) {
+            // Use empty name if the property is specified as `-Dprofile`
+            return "";
+        }
+        return profile;
     }
 
     private static boolean isActive() {

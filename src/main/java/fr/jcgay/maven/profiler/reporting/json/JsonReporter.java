@@ -31,7 +31,8 @@ public class JsonReporter implements Reporter {
 
     private String getJSONRepresentation(Data context) {
         JsonObject obj = new JsonObject();
-        obj.add("name", context.getName());
+        obj.add("name", context.getTopProjectName());
+        obj.add("profile_name", context.getProfileName());
         obj.add("time", ms(context.getBuildTime()));
         obj.add("goals", context.getGoals());
         obj.add("date", context.getFormattedDate());

@@ -1,5 +1,6 @@
 package fr.jcgay.maven.profiler
 
+
 import fr.jcgay.maven.profiler.reporting.html.HtmlReporter
 import fr.jcgay.maven.profiler.reporting.json.JsonReporter
 import fr.jcgay.maven.profiler.sorting.execution.ByExecutionOrder
@@ -19,13 +20,32 @@ class ConfigurationTest {
         System.clearProperty('disableTimeSorting')
     }
 
-    @Test
-    void 'indicate that profiling is active'() {
-        System.setProperty('profile', 'true')
+    @DataProvider
+    Object[][] 'active profile properties'() {
+        [[""], ["true"], ["Profile Name"]]
+    }
+
+    @Test(dataProvider = 'active profile properties')
+    void 'indicate that profiling is active'(String profileValue) {
+        System.setProperty('profile', profileValue)
 
         def result = Configuration.read()
 
         assertThat(result.isProfiling()).isTrue()
+    }
+
+    @DataProvider
+    Object[][] 'profile names'() {
+        [["", ""], ["true", ""], ["Profile Name", "Profile Name"]]
+    }
+
+    @Test(dataProvider = 'profile names')
+    void 'keeps profile name'(String profileValue, String expectedName) {
+        System.setProperty('profile', profileValue)
+
+        def result = Configuration.read()
+
+        assertThat(result.profileName()).isEqualTo(expectedName)
     }
 
     @DataProvider
@@ -84,6 +104,7 @@ class ConfigurationTest {
         def result = Configuration.read()
 
         assertThat(result.isProfiling()).isFalse()
+        assertThat(result.profileName()).isEmpty()
         assertThat(result.reporter().delegates).extracting("class").containsExactly(HtmlReporter)
         assertThat(result.sorter()).isExactlyInstanceOf(ByExecutionTime)
     }
