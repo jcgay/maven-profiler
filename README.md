@@ -54,8 +54,16 @@ Use property `profile` when running Maven.
 
 	mvn install -Dprofile
 
-This will generate a report in `.profiler` folder.  
-This also works when `mvn` is executed on multiple threads (option `-T`).
+This will generate a report in `.profiler` folder.
+
+You might also add a profile name, which is included in the [report](#report-format)
+and helps identify the experiment:
+    
+    mvn clean install -Dprofile="No custom JVM options"
+    export MAVEN_OPTS='-XX:TieredStopAtLevel=1 -XX:+UseParallelGC'
+    mvn clean install -Dprofile="With custom JVM options=${MAVEN_OPTS}"
+
+The extension also works when `mvn` is executed on multiple threads (option `-T`).
 
 ### Report format
 
