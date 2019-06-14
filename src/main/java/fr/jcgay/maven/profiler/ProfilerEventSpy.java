@@ -100,7 +100,8 @@ public class ProfilerEventSpy extends AbstractEventSpy {
             Data context = new Data()
                 .setProjects(sortedProjects())
                 .setDate(finishTime)
-                .setName(statistics.topProject().getName())
+                .setTopProjectName(statistics.topProject().getName())
+                .setProfileName(configuration.profileName())
                 .setGoals(Joiner.on(' ').join(statistics.goals()))
                 .setParameters(statistics.properties());
             setDownloads(context);

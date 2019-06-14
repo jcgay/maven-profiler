@@ -18,7 +18,8 @@ public class Data {
     private Stopwatch totalDownloadTime;
     private Stopwatch buildTime;
     private Date date;
-    private String name;
+    private String topProjectName;
+    private String profileName;
     private String goals;
     private Properties parameters;
 
@@ -50,8 +51,12 @@ public class Data {
         return new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date);
     }
 
-    public String getName() {
-        return name;
+    public String getTopProjectName() {
+        return topProjectName;
+    }
+
+    public String getProfileName() {
+        return profileName;
     }
 
     public String getGoals() {
@@ -87,8 +92,13 @@ public class Data {
         return this;
     }
 
-    public Data setName(String name) {
-        this.name = name;
+    public Data setTopProjectName(String name) {
+        this.topProjectName = name;
+        return this;
+    }
+
+    public Data setProfileName(String profileName) {
+        this.profileName = profileName;
         return this;
     }
 

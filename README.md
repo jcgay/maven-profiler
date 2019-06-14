@@ -111,6 +111,7 @@ or you can define it using a system property:
 ```
 {
   "name": "maven-profiler",
+  "profile_name": "",
   "time": "44681 ms",
   "goals": "clean install",
   "date": "2017/01/21 19:10:04",

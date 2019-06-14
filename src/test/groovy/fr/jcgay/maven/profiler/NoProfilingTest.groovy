@@ -25,7 +25,7 @@ class NoProfilingTest {
         RepositoryEvent endDownloadEvent = aRepositoryEvent(ARTIFACT_DOWNLOADED, anArtifact()).build()
 
         def statistics = new Statistics()
-        ProfilerEventSpy profiler = new ProfilerEventSpy(statistics, new Configuration(false, mock(Reporter), mock(Sorter)), { new Date() })
+        ProfilerEventSpy profiler = new ProfilerEventSpy(statistics, new Configuration(false, "", mock(Reporter), mock(Sorter)), { new Date() })
 
         // When
         profiler.onEvent(startEvent)
