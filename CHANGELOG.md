@@ -1,3 +1,9 @@
+# 3.0
+***
+
+- Add a profile name to produced reports ([af77d28](http://github.com/jcgay/maven-profiler/commit/af77d287f5681f888ca803e52edf907c6f069fc7)) by [@dmitry-timofeev](https://github.com/dmitry-timofeev)
+- Migrate to Java 8 ([9dcb687](http://github.com/jcgay/maven-profiler/commit/9dcb68756e9801bf0dc21f88c8413fc775a9ad09))
+
 # 2.6
 ***
 
