@@ -192,12 +192,6 @@
                     <configFile>jreleaser.yml</configFile>
                 </configuration>
             </plugin>
-            <plugin>
-                <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <goals>deploy jreleaser:release</goals>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
