@@ -2,6 +2,7 @@ package fr.jcgay.maven.profiler
 
 import fr.jcgay.maven.profiler.reporting.Reporter
 import fr.jcgay.maven.profiler.sorting.Sorter
+import groovy.transform.CompileStatic
 import org.apache.maven.execution.ExecutionEvent
 import org.assertj.guava.api.Assertions
 import org.eclipse.aether.RepositoryEvent
@@ -14,6 +15,7 @@ import static org.eclipse.aether.RepositoryEvent.EventType.ARTIFACT_DOWNLOADED
 import static org.eclipse.aether.RepositoryEvent.EventType.ARTIFACT_DOWNLOADING
 import static org.mockito.Mockito.mock
 
+@CompileStatic
 class NoProfilingTest {
 
     @Test
@@ -25,7 +27,8 @@ class NoProfilingTest {
         RepositoryEvent endDownloadEvent = aRepositoryEvent(ARTIFACT_DOWNLOADED, anArtifact()).build()
 
         def statistics = new Statistics()
-        ProfilerEventSpy profiler = new ProfilerEventSpy(statistics, new Configuration(false, "", mock(Reporter), mock(Sorter)), { new Date() })
+        ProfilerEventSpy profiler = new ProfilerEventSpy(() -> statistics, () -> new Configuration(false, "", mock(Reporter), mock(Sorter)), { new Date() })
+        profiler.init(null)
 
         // When
         profiler.onEvent(startEvent)
