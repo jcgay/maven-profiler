@@ -1,0 +1,45 @@
+release:
+    github:
+        owner: jcgay
+        username: jcgay
+        overwrite: true
+        skipTag: true
+        branch: master
+        files: false
+        artifacts: false
+        checksums: false
+        signatures: false
+        changelog:
+            links: true
+            formatted: ALWAYS
+            format: '- {{commitShortHash}} {{commitTitle}}'
+            contributors:
+                enabled: true
+            labelers:
+                - label: 'merge_pull'
+                  title: 'Merge pull'
+                - label: 'merge_branch'
+                  title: 'Merge branch'
+                - label: 'dependencies'
+                  title: 'Bump'
+                - label: 'release'
+                  title: '[maven-release-plugin]'
+                - label: 'issues'
+                  body: 'Fixes #'
+            categories:
+                - title: 'Noise'
+                  labels:
+                      - 'merge_pull'
+                      - 'merge_branch'
+                      - 'release'
+                - title: '✅ Issues'
+                  labels:
+                      - 'issue'
+                - title: '⚙️ Dependencies'
+                  labels:
+                      - 'dependencies'
+            hide:
+                categories:
+                    - 'Noise'
+                contributors:
+                    - 'dependabot'

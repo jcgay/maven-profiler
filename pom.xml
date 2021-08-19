@@ -184,6 +184,20 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.jreleaser</groupId>
+                <artifactId>jreleaser-maven-plugin</artifactId>
+                <version>0.6.0</version>
+                <configuration>
+                    <configFile>jreleaser.yml</configFile>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-release-plugin</artifactId>
+                <configuration>
+                    <goals>deploy jreleaser:release</goals>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
