@@ -97,6 +97,17 @@
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <configuration>
+                        <append>true</append>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.plexus</groupId>
@@ -161,6 +172,7 @@
                     <cloneClean>true</cloneClean>
                     <showVersion>true</showVersion>
                     <postBuildHookScript>verify.groovy</postBuildHookScript>
+                    <mavenOpts>${argLine}</mavenOpts>
                 </configuration>
                 <executions>
                     <execution>
