@@ -20,7 +20,7 @@ class ReportDirectoryTest {
     }
 
     @Test
-    void 'write reports in .profiler folder'() {
+    void 'write reports in hidden profiler folder'() {
         MavenProject project = MavenStubs.aMavenProject('default-directory')
 
         def result = new ReportDirectory(project).fileName(now, HTML)
