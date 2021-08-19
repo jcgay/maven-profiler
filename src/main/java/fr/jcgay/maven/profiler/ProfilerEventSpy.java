@@ -3,7 +3,6 @@ package fr.jcgay.maven.profiler;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
-import com.google.common.base.Supplier;
 import fr.jcgay.maven.profiler.reporting.ReportDirectory;
 import fr.jcgay.maven.profiler.reporting.template.Data;
 import fr.jcgay.maven.profiler.reporting.template.EntryAndTime;
@@ -28,6 +27,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
 
 import static fr.jcgay.maven.profiler.KnownElapsedTimeTicker.aStopWatchWithElapsedTime;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -39,23 +39,26 @@ import static org.eclipse.aether.RepositoryEvent.EventType.ARTIFACT_DOWNLOADING;
 @Component(role = EventSpy.class, hint = "profiler", description = "Measure times taken by Maven.")
 public class ProfilerEventSpy extends AbstractEventSpy {
 
-    private final Statistics statistics;
-    private final Configuration configuration;
+    private final Supplier<Statistics> statisticsSupplier;
+    private final Supplier<Configuration> configurationSupplier;
     private final Supplier<Date> now;
+
+    private Configuration configuration;
+    private Statistics statistics;
 
     @Requirement
     private Logger logger;
 
     public ProfilerEventSpy() {
-        this.statistics = new Statistics();
-        this.configuration = Configuration.read();
+        this.statisticsSupplier = Statistics::new;
+        this.configurationSupplier = Configuration::read;
         this.now = Date::new;
     }
 
     @VisibleForTesting
-    ProfilerEventSpy(Statistics statistics, Configuration configuration, Supplier<Date> now) {
-        this.statistics = statistics;
-        this.configuration = configuration;
+    ProfilerEventSpy(Supplier<Statistics> statisticsSupplier, Supplier<Configuration> configurationSupplier, Supplier<Date> now) {
+        this.statisticsSupplier = statisticsSupplier;
+        this.configurationSupplier = configurationSupplier;
         this.logger = new ConsoleLogger();
         this.now = now;
     }
@@ -63,6 +66,10 @@ public class ProfilerEventSpy extends AbstractEventSpy {
     @Override
     public void init(Context context) throws Exception {
         super.init(context);
+
+        this.configuration = configurationSupplier.get();
+        this.statistics = statisticsSupplier.get();
+
         if (configuration.isProfiling()) {
             logger.info("Profiling mvn execution...");
         }

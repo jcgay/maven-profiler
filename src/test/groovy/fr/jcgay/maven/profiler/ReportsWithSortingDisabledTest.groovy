@@ -36,7 +36,8 @@ class ReportsWithSortingDisabledTest {
             .setTopProject(aMavenTopProject('top-project'))
 
         def profileName = 'P1'
-        profiler = new ProfilerEventSpy(statistics, new Configuration(true, profileName, reporter, new ByExecutionOrder()), { new Date() })
+        profiler = new ProfilerEventSpy(() -> statistics, () -> new Configuration(true, profileName, reporter, new ByExecutionOrder()), { new Date() })
+        profiler.init(null)
     }
 
     @Test
