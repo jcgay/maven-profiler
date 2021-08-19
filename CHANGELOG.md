@@ -1,3 +1,11 @@
+# 3.1
+***
+
+- Generate changelog with JReleaser ([0859012](http://github.com/jcgay/maven-profiler/commit/0859012b7920636739ce7315eb846be4f7a84ba4))
+- Report ITs in code coverage ([1ec1b57](http://github.com/jcgay/maven-profiler/commit/1ec1b5718b270487737c73b499618e398db17522))
+- Activate profiling with mvnd ([2ca2338](http://github.com/jcgay/maven-profiler/commit/2ca23386031a4e20d6ed1ba3ac9547084ea1e1f4))
+- Build with GitHub actions ([944447c](http://github.com/jcgay/maven-profiler/commit/944447c3e9bd7ef5598d6e6b81f31845da870e4f))
+
 # 3.0
 ***
 
@@ -35,5 +43,5 @@
 # 2.1
 ***
 
-- Minimize shaded JAR size [[view]](http://github.com/jcgay/maven-profiler/commit/70d5605c95beb7604491ef67c3e55dd5827e1388)  
-- Generate report in JSON [[view]](http://github.com/jcgay/maven-profiler/commit/f5b95067ee84af2b6934a76a98d30f0773d4cbf6) by [@jasongardnerlv](https://github.com/jasongardnerlv)  
+- Minimize shaded JAR size [[view]](http://github.com/jcgay/maven-profiler/commit/70d5605c95beb7604491ef67c3e55dd5827e1388)
+- Generate report in JSON [[view]](http://github.com/jcgay/maven-profiler/commit/f5b95067ee84af2b6934a76a98d30f0773d4cbf6) by [@jasongardnerlv](https://github.com/jasongardnerlv)

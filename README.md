@@ -25,24 +25,24 @@ It is based on latest maven release.
 
 ### Maven >= 3.3.x
 
-Get [maven-profiler](http://dl.bintray.com/jcgay/maven/fr/jcgay/maven/maven-profiler/3.0/maven-profiler-3.0-shaded.jar) and copy it in `%M2_HOME%/lib/ext` folder.
+Get [maven-profiler](https://repo1.maven.org/maven2/fr/jcgay/maven/maven-profiler/3.1/maven-profiler-3.1-shaded.jar) and copy it in `%M2_HOME%/lib/ext` folder.
 
 *or*
 
-Use the new [core extensions configuration mechanism](http://takari.io/2015/03/19/core-extensions.html) by creating a `${maven.multiModuleProjectDirectory}/.mvn/extensions.xml` file with:
+Use the [core extensions configuration mechanism](http://takari.io/2015/03/19/core-extensions.html) by creating a `${maven.multiModuleProjectDirectory}/.mvn/extensions.xml` file with:
 
 	<?xml version="1.0" encoding="UTF-8"?>
 	<extensions>
 	    <extension>
 	      <groupId>fr.jcgay.maven</groupId>
 	      <artifactId>maven-profiler</artifactId>
-	      <version>3.0</version>
+	      <version>3.1</version>
 	    </extension>
 	</extensions>
 
 ### Maven >= 3.1.x
 
-Get [maven-profiler](http://dl.bintray.com/jcgay/maven/fr/jcgay/maven/maven-profiler/3.0/maven-profiler-3.0-shaded.jar) and copy it in `%M2_HOME%/lib/ext` folder.
+Get [maven-profiler](https://repo1.maven.org/maven2/fr/jcgay/maven/maven-profiler/3.1/maven-profiler-3.1-shaded.jar) and copy it in `%M2_HOME%/lib/ext` folder.
 
 ### Maven 3.0.x
 (with limited functionality, kept for compatibility)
