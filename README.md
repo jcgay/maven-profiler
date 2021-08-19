@@ -25,24 +25,24 @@ It is based on latest maven release.
 
 ### Maven >= 3.3.x
 
-Get [maven-profiler](http://dl.bintray.com/jcgay/maven/fr/jcgay/maven/maven-profiler/3.0/maven-profiler-3.0-shaded.jar) and copy it in `%M2_HOME%/lib/ext` folder.
+Get [maven-profiler](https://repo1.maven.org/maven2/fr/jcgay/maven/maven-profiler/3.1.1/maven-profiler-3.1.1-shaded.jar) and copy it in `%M2_HOME%/lib/ext` folder.
 
 *or*
 
-Use the new [core extensions configuration mechanism](http://takari.io/2015/03/19/core-extensions.html) by creating a `${maven.multiModuleProjectDirectory}/.mvn/extensions.xml` file with:
+Use the [core extensions configuration mechanism](http://takari.io/2015/03/19/core-extensions.html) by creating a `${maven.multiModuleProjectDirectory}/.mvn/extensions.xml` file with:
 
 	<?xml version="1.0" encoding="UTF-8"?>
 	<extensions>
 	    <extension>
 	      <groupId>fr.jcgay.maven</groupId>
 	      <artifactId>maven-profiler</artifactId>
-	      <version>3.0</version>
+	      <version>3.1.1</version>
 	    </extension>
 	</extensions>
 
 ### Maven >= 3.1.x
 
-Get [maven-profiler](http://dl.bintray.com/jcgay/maven/fr/jcgay/maven/maven-profiler/3.0/maven-profiler-3.0-shaded.jar) and copy it in `%M2_HOME%/lib/ext` folder.
+Get [maven-profiler](https://repo1.maven.org/maven2/fr/jcgay/maven/maven-profiler/3.1.1/maven-profiler-3.1.1-shaded.jar) and copy it in `%M2_HOME%/lib/ext` folder.
 
 ### Maven 3.0.x
 (with limited functionality, kept for compatibility)
@@ -58,7 +58,7 @@ This will generate a report in `.profiler` folder.
 
 You might also add a profile name, which is included in the [report](#report-format)
 and helps identify the experiment:
-    
+
     mvn clean install -Dprofile="No custom JVM options"
     export MAVEN_OPTS='-XX:TieredStopAtLevel=1 -XX:+UseParallelGC'
     mvn clean install -Dprofile="With custom JVM options=${MAVEN_OPTS}"
@@ -67,7 +67,7 @@ The extension also works when `mvn` is executed on multiple threads (option `-T`
 
 ### Report format
 
-One can choose between `HTML` (by default) or `JSON` report using property `profileFormat`. 
+One can choose between `HTML` (by default) or `JSON` report using property `profileFormat`.
 
     mvn install -Dprofile -DprofileFormat=HTML
 
@@ -83,7 +83,7 @@ Also you can add the property `disableTimeSorting` if you want the reported time
 
 ### Report directory
 
-Report default directory (`.profiler`) can be customized.  
+Report default directory (`.profiler`) can be customized.
 You can set it as a Maven property, for example in `pom.xml`:
 
 ```

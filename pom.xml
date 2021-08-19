@@ -10,7 +10,7 @@
 
     <groupId>fr.jcgay.maven</groupId>
     <artifactId>maven-profiler</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>3.1.1-SNAPSHOT</version>
     <description>Log Maven mojos execution time</description>
 
     <prerequisites>
