@@ -193,7 +193,7 @@ or you can define it using a system property:
 
 ## Build status
 
-[![Build Status](https://travis-ci.org/jcgay/maven-profiler.png)](https://travis-ci.org/jcgay/maven-profiler)
+[![Build Status](https://github.com/jcgay/maven-profiler/actions/workflows/maven.yml/badge.svg)](https://github.com/jcgay/maven-profiler/actions/workflows/maven.yml)
 [![Coverage Status](https://coveralls.io/repos/jcgay/maven-profiler/badge.svg?branch=master)](https://coveralls.io/r/jcgay/maven-profiler?branch=master)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=fr.jcgay.maven%3Amaven-profiler&metric=alert_status)](https://sonarqube.com/dashboard/index/fr.jcgay.maven:maven-profiler)
 [![Technical debt ratio](https://sonarcloud.io/api/project_badges/measure?project=fr.jcgay.maven%3Amaven-profiler&metric=sqale_index)](https://sonarqube.com/dashboard/index/fr.jcgay.maven:maven-profiler)
