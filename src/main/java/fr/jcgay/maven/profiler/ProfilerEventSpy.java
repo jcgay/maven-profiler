@@ -82,7 +82,9 @@ public class ProfilerEventSpy extends AbstractEventSpy {
             if (event instanceof DefaultMavenExecutionRequest) {
                 DefaultMavenExecutionRequest mavenEvent = (DefaultMavenExecutionRequest) event;
                 statistics.setGoals(new LinkedHashSet<>(mavenEvent.getGoals()));
-                statistics.setProperties(mavenEvent.getUserProperties());
+                if (configuration.shouldPrintParameters()) {
+                    statistics.setProperties(mavenEvent.getUserProperties());
+                }
             } else if (event instanceof ExecutionEvent) {
                 storeExecutionEvent((ExecutionEvent) event);
                 trySaveTopProject((ExecutionEvent) event);

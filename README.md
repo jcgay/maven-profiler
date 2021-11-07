@@ -96,6 +96,12 @@ or you can define it using a system property:
 
     mvn install -Dprofile -Dmaven-profiler-report-directory=/tmp/profiler-custom-report
 
+### Hide parameters in reports
+
+User parameters could leak sensitive data, you can disable reporting them using:
+
+    mvn install -Dprofile -DhideParameters=true
+
 ## Output examples
 
 ### HTML
