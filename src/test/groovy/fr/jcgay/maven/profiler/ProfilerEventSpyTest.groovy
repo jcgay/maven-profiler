@@ -47,7 +47,7 @@ class ProfilerEventSpyTest {
             .setTopProject(topProject)
 
         def profileName = "P1"
-        profiler = new ProfilerEventSpy(() -> statistics, () -> new Configuration(true, profileName, reporter, sorter), { finishTime })
+        profiler = new ProfilerEventSpy(() -> statistics, () -> new Configuration(true, profileName, reporter, sorter, true), { finishTime })
         profiler.init(null)
     }
 

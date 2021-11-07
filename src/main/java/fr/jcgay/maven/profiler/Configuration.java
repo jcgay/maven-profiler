@@ -23,6 +23,7 @@ public class Configuration {
     private static final String PROFILE = "profile";
     private static final String PROFILE_FORMAT = "profileFormat";
     private static final String DISABLE_TIME_SORTING = "disableTimeSorting";
+    private static final String DISABLE_PARAMETERS_REPORT = "hideParameters";
 
     private static final Function<String,Reporter> reporters =  compose(forMap(ImmutableMap.<String,Reporter>builder()
     		.put("html", new HtmlReporter())
@@ -33,17 +34,18 @@ public class Configuration {
     private final String profileName;
     private final Reporter reporter;
     private final Sorter sorter;
+    private final boolean shouldPrintParameters;
 
-    public Configuration(boolean isProfiling, String profileName, Reporter reporter,
-        Sorter sorter) {
+    public Configuration(boolean isProfiling, String profileName, Reporter reporter, Sorter sorter, boolean shouldPrintParameters) {
         this.isProfiling = isProfiling;
         this.profileName = checkNotNull(profileName);
         this.reporter = reporter;
         this.sorter = sorter;
+        this.shouldPrintParameters = shouldPrintParameters;
     }
 
     public static Configuration read() {
-        return new Configuration(isActive(), getProfileName(), chooseReporter(), chooseSorter());
+        return new Configuration(isActive(), getProfileName(), chooseReporter(), chooseSorter(), hasParametersReportEnabled());
     }
 
     public boolean isProfiling() {
@@ -61,6 +63,14 @@ public class Configuration {
 
     public Sorter sorter() {
         return sorter;
+    }
+
+    public boolean shouldPrintParameters() {
+        return shouldPrintParameters;
+    }
+
+    private static boolean hasParametersReportEnabled() {
+        return Boolean.parseBoolean(System.getProperty(DISABLE_PARAMETERS_REPORT, "false"));
     }
 
     private static Sorter chooseSorter() {
