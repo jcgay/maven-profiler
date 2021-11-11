@@ -11,7 +11,8 @@ on:
 
 jobs:
   build:
-
+    env:
+      coveralls_token: ${{ secrets.COVERALLS_TOKEN }}
     runs-on: ubuntu-latest
 
     steps:
@@ -27,4 +28,7 @@ jobs:
         path: ~/.m2/repository
         key: local-maven-repository
     - name: Build with Maven
-      run: ./mvnw -B verify coveralls:report -Prun-coverage -DrepoToken=${{ secrets.COVERALLS_TOKEN }}
+      run: ./mvnw -B verify -Prun-coverage
+    - name: Report coverage
+      run: ./mvnw -B coveralls:report -DrepoToken="${{ env.coveralls_token }}"
+      if: ${{env.coveralls_token}} != ""
