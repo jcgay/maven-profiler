@@ -31,4 +31,4 @@ jobs:
       run: ./mvnw -B verify -Prun-coverage
     - name: Report coverage
       run: ./mvnw -B coveralls:report -DrepoToken="${{ env.coveralls_token }}"
-      if: ${{env.coveralls_token}} != ""
+      if: ${{ github.repository_owner == 'jcgay' && github.actor != 'dependabot[bot]' }}
