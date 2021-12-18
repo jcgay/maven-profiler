@@ -233,8 +233,8 @@ User parameters could leak sensitive data, you can disable reporting them using:
 
 [![Build Status](https://github.com/jcgay/maven-profiler/actions/workflows/maven.yml/badge.svg)](https://github.com/jcgay/maven-profiler/actions/workflows/maven.yml)
 [![Coverage Status](https://coveralls.io/repos/jcgay/maven-profiler/badge.svg?branch=master)](https://coveralls.io/r/jcgay/maven-profiler?branch=master)
-[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=fr.jcgay.maven%3Amaven-profiler&metric=alert_status)](https://sonarqube.com/dashboard/index/fr.jcgay.maven:maven-profiler)
-[![Technical debt ratio](https://sonarcloud.io/api/project_badges/measure?project=fr.jcgay.maven%3Amaven-profiler&metric=sqale_index)](https://sonarqube.com/dashboard/index/fr.jcgay.maven:maven-profiler)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=fr.jcgay.maven%3Amaven-profiler&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=fr.jcgay.maven%3Amaven-profiler)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=fr.jcgay.maven%3Amaven-profiler&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=fr.jcgay.maven%3Amaven-profiler)
 
 ## Release
 
