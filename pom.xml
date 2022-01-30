@@ -10,7 +10,7 @@
 
     <groupId>fr.jcgay.maven</groupId>
     <artifactId>maven-profiler</artifactId>
-    <version>3.2</version>
+    <version>3.3-SNAPSHOT</version>
     <description>Log Maven mojos execution time</description>
 
     <prerequisites>
@@ -21,7 +21,7 @@
         <url>https://github.com/jcgay/maven-profiler.git</url>
         <connection>scm:git:git://github.com/jcgay/maven-profiler.git</connection>
         <developerConnection>scm:git:git@github.com:jcgay/maven-profiler.git</developerConnection>
-        <tag>v3.2</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
