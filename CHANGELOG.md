@@ -1,3 +1,12 @@
+# 3.2
+
+- Restore sonarcloud analysis ([e75872c](http://github.com/jcgay/maven-profiler/commit/e75872cec8647bc1d6fdb20c6d8da8b23b70051
+- Remove deprecated code ([c096a4f](http://github.com/jcgay/maven-profiler/commit/c096a4febdcd8934a86163256fdb238e21da4e98))
+- Set Locale when running test with Maven ([27c99b2](http://github.com/jcgay/maven-profiler/commit/27c99b20ed1ba7af8162fbba44609129026dec28))
+- Bump Maven from 3.8.2 to 3.8.4 ([1e000e9](http://github.com/jcgay/maven-profiler/commit/1e000e978f2b5589ab43e2e05b185cf90a45915c))
+- Add console reporter (writes to the System.out) ([d763fd7](http://github.com/jcgay/maven-profiler/commit/d763fd7e3e35f14b3ce680b21e38013cecb5865d))
+- Hide user parameters in report ([9d80c3a](http://github.com/jcgay/maven-profiler/commit/9d80c3a0d2cd8e875b36a4232b9aebe93c97d0d8))
+
 # 3.1.1
 ***
 
