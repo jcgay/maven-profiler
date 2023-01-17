@@ -80,7 +80,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-guava</artifactId>
-            <version>1.0.0</version>
+            <version>3.24.2</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
