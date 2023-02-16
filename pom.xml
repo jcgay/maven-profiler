@@ -171,7 +171,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-invoker-plugin</artifactId>
-                <version>3.2.2</version>
+                <version>3.5.0</version>
                 <configuration>
                     <projectsDirectory>src/it</projectsDirectory>
                     <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
