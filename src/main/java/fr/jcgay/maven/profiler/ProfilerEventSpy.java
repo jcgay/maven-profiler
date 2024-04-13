@@ -51,7 +51,9 @@ public class ProfilerEventSpy extends AbstractEventSpy {
 
     public ProfilerEventSpy() {
         this.statisticsSupplier = Statistics::new;
+        this.statistics = statisticsSupplier.get();
         this.configurationSupplier = Configuration::read;
+        this.configuration = configurationSupplier.get();
         this.now = Date::new;
     }
 
