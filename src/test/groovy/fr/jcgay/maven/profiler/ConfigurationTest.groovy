@@ -108,4 +108,31 @@ class ConfigurationTest {
         assertThat(result.reporter().delegates).extracting("class").containsExactly(HtmlReporter)
         assertThat(result.sorter()).isExactlyInstanceOf(ByExecutionTime)
     }
+
+    @Test
+    void 'disable parameter report when hideParameters is unset'() {
+        System.clearProperty(Configuration.DISABLE_PARAMETERS_REPORT)
+
+        def result = Configuration.read()
+
+        assertThat(result.shouldPrintParameters()).isFalse()
+    }
+
+    @Test
+    void 'disable parameter report when hideParameters is true'() {
+        System.setProperty(Configuration.DISABLE_PARAMETERS_REPORT, Boolean.TRUE.toString())
+
+        def result = Configuration.read()
+
+        assertThat(result.shouldPrintParameters()).isFalse()
+    }
+
+    @Test
+    void 'enable parameter report when hideParameters is false'() {
+        System.setProperty(Configuration.DISABLE_PARAMETERS_REPORT, Boolean.FALSE.toString())
+
+        def result = Configuration.read()
+
+        assertThat(result.shouldPrintParameters()).isTrue()
+    }
 }

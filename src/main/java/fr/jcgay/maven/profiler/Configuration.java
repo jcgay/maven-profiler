@@ -1,5 +1,6 @@
 package fr.jcgay.maven.profiler;
 
+import com.google.common.annotations.VisibleForTesting;
 import fr.jcgay.maven.profiler.reporting.CompositeReporter;
 import fr.jcgay.maven.profiler.reporting.Reporter;
 import fr.jcgay.maven.profiler.reporting.console.ConsoleReporter;
@@ -24,7 +25,8 @@ public class Configuration {
     private static final String PROFILE = "profile";
     private static final String PROFILE_FORMAT = "profileFormat";
     private static final String DISABLE_TIME_SORTING = "disableTimeSorting";
-    private static final String DISABLE_PARAMETERS_REPORT = "hideParameters";
+    @VisibleForTesting
+    static final String DISABLE_PARAMETERS_REPORT = "hideParameters";
 
     private static final Function<String,Reporter> reporters =  compose(forMap(ImmutableMap.<String,Reporter>builder()
     		.put("html", new HtmlReporter())
@@ -72,7 +74,9 @@ public class Configuration {
     }
 
     private static boolean hasParametersReportEnabled() {
-        return Boolean.parseBoolean(System.getProperty(DISABLE_PARAMETERS_REPORT, "false"));
+        // Inversion of logic: System property is called "hideParameters", but method returns the inverted result
+        // If the parameter is true or not set, the report is not printed (see issue 224)
+        return !Boolean.parseBoolean(System.getProperty(DISABLE_PARAMETERS_REPORT, "true"));
     }
 
     private static Sorter chooseSorter() {
