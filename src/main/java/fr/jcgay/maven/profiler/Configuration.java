@@ -72,7 +72,9 @@ public class Configuration {
     }
 
     private static boolean hasParametersReportEnabled() {
-        return Boolean.parseBoolean(System.getProperty(DISABLE_PARAMETERS_REPORT, "false"));
+        // Inversion of logic: System property is called "hideParameters", but method returns the inverted result
+        // If the parameter is true or not set, the report is not printed (see issue 224)
+        return !Boolean.parseBoolean(System.getProperty(DISABLE_PARAMETERS_REPORT, "true"));
     }
 
     private static Sorter chooseSorter() {
