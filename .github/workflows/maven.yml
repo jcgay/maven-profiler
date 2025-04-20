@@ -43,5 +43,5 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: ./mvnw -B sonar:sonar -Dsonar.projectKey=fr.jcgay.maven:maven-profiler -Dsonar.organization=jcgay-github -Dsonar.host.url=https://sonarcloud.io
+      run: ./mvnw -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=jcgay_maven-profiler -Dsonar.organization=jcgay-github -Dsonar.host.url=https://sonarcloud.io
       if: ${{ github.repository_owner == 'jcgay' && github.actor != 'dependabot[bot]' }}
