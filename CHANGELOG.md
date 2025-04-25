@@ -1,3 +1,12 @@
+# 3.3
+
+- Bump Maven from 3.8.4 to 3.9.9 ([df13653](https://github.com/softwarevidal//commit/df13653dd403adbf617b027cde1b76b68fbca8cd))
+- Fix SonarQube README badges ([2e7c6d1](https://github.com/softwarevidal//commit/2e7c6d1572658dfa78d664b528e3b5bdc11b03d6))
+- Prevent NPE when extension is initiated after another one ([124b350](https://github.com/softwarevidal//commit/124b3507035206a44242d8e7941bc2d3dce72a53))
+- Fix SonarQube project key ([25788ee](https://github.com/softwarevidal//commit/25788ee4ffdb07ab5507ac29fad0f8299a207a86))
+- Fix behavior of hideParameters property ([41d03ab](https://github.com/softwarevidal//commit/41d03abeb794b00b08dd70e95bc1c28e75909df8)) by [@cgm-aw](https://github.com/cgm-aw)
+- Activate Reproducible Builds ([c351f8c](https://github.com/softwarevidal//commit/c351f8ca798428e6f40cff6614dd2c54c0783cbb)) by [@hboutemy](https://github.com/hboutemy)
+
 # 3.2
 
 - Restore sonarcloud analysis ([e75872c](http://github.com/jcgay/maven-profiler/commit/e75872cec8647bc1d6fdb20c6d8da8b23b70051))
