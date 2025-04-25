@@ -10,7 +10,7 @@
 
     <groupId>fr.jcgay.maven</groupId>
     <artifactId>maven-profiler</artifactId>
-    <version>3.3</version>
+    <version>3.4-SNAPSHOT</version>
     <description>Log Maven mojos execution time</description>
 
     <prerequisites>
@@ -21,14 +21,14 @@
         <url>https://github.com/jcgay/maven-profiler.git</url>
         <connection>scm:git:git://github.com/jcgay/maven-profiler.git</connection>
         <developerConnection>scm:git:git@github.com:jcgay/maven-profiler.git</developerConnection>
-        <tag>v3.3</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.outputTimestamp>2025-04-25T06:06:49Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2025-04-25T06:07:37Z</project.build.outputTimestamp>
         <argLine>-Duser.country=US -Duser.language=en</argLine>
     </properties>
 
